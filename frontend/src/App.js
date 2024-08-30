@@ -1,54 +1,45 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './App.css';
-// Import API functions from the api.js file
-import { getChannels, getNotifications, getDirectMessages } from './services/api';
+// Import components
+import Sidebar from './components/Sidebar';
+import Notifications from './Notifications/Notifications';
+import Channels from './Channels/Channels';
+import Messages from './Messages/Messages';
+import MessageList from './components/MessageList';
+import MessageInput from './components/MessageInput';
+// Import custom hook
+import useAppData from './hooks/useAppData';
 
 function App() {
+  // Use custom hook to manage app data
+  // Hooks allow us to use state and other React features without writing a class
+  // useAppData is a custom hook that fetches and manages channels, notifications, and direct messages
+  const {
+    channels,
+    notifications,
+    directMessages,
+    selectedChannel,
+    setSelectedChannel,
+    selectedDirectMessage,
+    setSelectedDirectMessage,
+  } = useAppData();
+
+  // useState is a hook that lets you add React state to function components
+  // Here we use it to manage the visibility of sidebar items and the current input message
+
   // State variables to control the visibility of each sidebar list
   const [isChannelListOpen, setIsChannelListOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
 
-  // State variables to store data fetched from API
-  const [channels, setChannels] = useState([]);
-  const [notifications, setNotifications] = useState([]);
-  const [directMessages, setDirectMessages] = useState([]);
-
-  // State variables for selected channel or direct message
-  const [selectedChannel, setSelectedChannel] = useState(null);
-  const [selectedDirectMessage, setSelectedDirectMessage] = useState(null);
-
-  // New state variable for the input field
+  // State for the current input message
   const [inputMessage, setInputMessage] = useState('');
 
-  // New state variable to store messages
+  // State to store all messages in the current conversation
   const [messages, setMessages] = useState([]);
 
-  // Fetch data when component mounts
-  useEffect(() => {
-    const fetchData = async () => {
-      // API call to get channels
-      const channelsData = await getChannels();
-      // API call to get notifications
-      const notificationsData = await getNotifications();
-      // API call to get direct messages
-      const directMessagesData = await getDirectMessages();
-
-      // Update state with fetched data
-      setChannels(channelsData);
-      setNotifications(notificationsData);
-      setDirectMessages(directMessagesData);
-
-      // Set default selected channel to the first channel
-      if (channelsData.length > 0) {
-        setSelectedChannel(channelsData[0]);
-      }
-    };
-
-    fetchData();
-  }, []);
-
   // Toggle functions for sidebar items
+  // These functions ensure only one list is open at a time
   const toggleChannelList = () => {
     setIsChannelListOpen(!isChannelListOpen);
     setIsNotificationsOpen(false);
@@ -68,23 +59,26 @@ function App() {
   };
 
   // Function to handle channel selection
+  // When a channel is selected, we clear any selected direct message
   const handleChannelSelect = (channel) => {
     setSelectedChannel(channel);
     setSelectedDirectMessage(null);
   };
 
   // Function to handle direct message selection
+  // When a direct message is selected, we clear any selected channel
   const handleDirectMessageSelect = (message) => {
     setSelectedDirectMessage(message);
     setSelectedChannel(null);
   };
 
-  // Function to handle input change
+  // Function to handle input change in the message input field
   const handleInputChange = (e) => {
     setInputMessage(e.target.value);
   };
 
   // Function to handle message submission
+  // This creates a new message object and adds it to the messages array
   const handleMessageSubmit = (e) => {
     e.preventDefault();
     if (inputMessage.trim() !== '') {
@@ -101,68 +95,21 @@ function App() {
 
   return (
     <div className="App">
-      {/* Sidebar with icons for different sections */}
-      <div className="sidebar">
-        <div className="sidebar-item" onClick={toggleNotifications}>
-          <i className="icon">🔔</i>
-          <span>Notifications</span>
-        </div>
-        <div className="sidebar-item" onClick={toggleChannelList}>
-          <i className="icon">🏠</i>
-          <span>Channels</span>
-        </div>
-        <div className="sidebar-item" onClick={toggleMessages}>
-          <i className="icon">💬</i>
-          <span>Messages</span>
-        </div>
-        <div className="sidebar-item profile">
-          <i className="icon">👤</i>
-          <span>Profile</span>
-        </div>
-      </div>
+      {/* Sidebar component - contains navigation icons */}
+      <Sidebar
+        toggleNotifications={toggleNotifications}
+        toggleChannelList={toggleChannelList}
+        toggleMessages={toggleMessages}
+      />
 
       {/* Channel list - visible when isChannelListOpen is true */}
-      {isChannelListOpen && (
-        <div className="channel-list">
-          <h2>Channels</h2>
-          <ul>
-            {/* Map through channels data from API to display channel list */}
-            {channels.map(channel => (
-              <li key={channel.id} onClick={() => handleChannelSelect(channel)}>
-                # {channel.name}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {isChannelListOpen && <Channels channels={channels} handleChannelSelect={handleChannelSelect} />}
 
       {/* Notifications list - visible when isNotificationsOpen is true */}
-      {isNotificationsOpen && (
-        <div className="notifications-list">
-          <h2>Notifications</h2>
-          <ul>
-            {/* Map through notifications data from API to display notifications */}
-            {notifications.map(notification => (
-              <li key={notification.id}>{notification.message}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {isNotificationsOpen && <Notifications notifications={notifications} />}
 
       {/* Messages list - visible when isMessagesOpen is true */}
-      {isMessagesOpen && (
-        <div className="messages-list">
-          <h2>Direct Messages</h2>
-          <ul>
-            {/* Map through directMessages data from API to display direct messages */}
-            {directMessages.map(message => (
-              <li key={message.id} onClick={() => handleDirectMessageSelect(message)}>
-                {message.name} {message.unread > 0 && `(${message.unread})`}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {isMessagesOpen && <Messages directMessages={directMessages} handleDirectMessageSelect={handleDirectMessageSelect} />}
 
       {/* Main content area */}
       <div className="main-content">
@@ -170,36 +117,21 @@ function App() {
           <h1>{selectedChannel ? `# ${selectedChannel.name}` : selectedDirectMessage ? `${selectedDirectMessage.name}` : 'Select a channel or message'}</h1>
           <p>{selectedChannel ? 'Channel chat' : selectedDirectMessage ? 'Direct message' : 'Please select a channel or direct message to start chatting'}</p>
         </header>
-        <div className="message-list">
-          {/* Display messages */}
-          {messages.map(message => (
-            <div key={message.id} className="message">
-              <strong>{message.sender}:</strong> {message.text}
-              <span className="timestamp">{message.timestamp}</span>
-            </div>
-          ))}
-          {messages.length === 0 && (selectedChannel || selectedDirectMessage) && (
-            <div className="message">
-              <strong>System:</strong> No messages yet. Start the conversation!
-            </div>
-          )}
-          {!selectedChannel && !selectedDirectMessage && (
-            <div className="message">
-              <strong>System:</strong> Select a channel or direct message to view the conversation.
-            </div>
-          )}
-        </div>
-        {/* Message input field */}
+        
+        {/* MessageList component - displays all messages in the current conversation */}
+        <MessageList
+          messages={messages}
+          selectedChannel={selectedChannel}
+          selectedDirectMessage={selectedDirectMessage}
+        />
+        
+        {/* MessageInput component - allows user to type and send messages */}
         {(selectedChannel || selectedDirectMessage) && (
-          <form onSubmit={handleMessageSubmit} className="message-input">
-            <input
-              type="text"
-              value={inputMessage}
-              onChange={handleInputChange}
-              placeholder="Type your message here..."
-            />
-            <button type="submit">Send</button>
-          </form>
+          <MessageInput
+            inputMessage={inputMessage}
+            handleInputChange={handleInputChange}
+            handleMessageSubmit={handleMessageSubmit}
+          />
         )}
       </div>
     </div>
