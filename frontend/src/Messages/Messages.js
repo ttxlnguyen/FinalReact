@@ -1,31 +1,35 @@
 import React from 'react';
 
 // Messages component
-// This component displays a list of direct messages and allows the user to select a conversation
-// It receives the directMessages data and a message selection handler as props from the parent component (App.js)
-function Messages({ directMessages, handleDirectMessageSelect }) {
+// This component displays a list of messages and allows the user to select a conversation
+// It receives the messages data and a message selection handler as props from the parent component (App.js)
+function Messages({ messages, handleDirectMessageSelect }) {
   return (
     <div className="messages-list">
-      <h2>Direct Messages</h2>
+      <h2>Messages</h2>
       <ul>
         {/* 
-          Map through the directMessages array and render each message as a clickable list item
-          Each message is expected to have an 'id', 'name', and 'unread' property
+          Map through the messages array and render each message as a clickable list item
+          Each message is expected to have an 'id', 'sender', and 'text' property
           The 'key' prop is important for React's reconciliation process
           When a message is clicked, it calls the handleDirectMessageSelect function passed from the parent
         */}
-        {directMessages.map(message => (
+        {messages.map(message => (
           <li key={message.id} onClick={() => handleDirectMessageSelect(message)}>
-            {message.name} {message.unread > 0 && `(${message.unread})`}
+            <strong>{message.sender}:</strong> {message.text.substring(0, 30)}...
           </li>
         ))}
       </ul>
       {/* 
-        Possible improvements:
-        - Add a search functionality for direct messages
-        - Show online/offline status for each user
-        - Add the ability to start a new direct message
-        - Show the last message preview for each conversation
+
+          TODO:
+          - Add the ability to start a new conversation
+
+        After MVP we should consider:
+        - Add a search functionality for messages
+        - Group messages by conversation or channel
+        - Show timestamps for each message
+        - Implement infinite scrolling for large message lists
       */}
     </div>
   );
@@ -33,9 +37,29 @@ function Messages({ directMessages, handleDirectMessageSelect }) {
 
 export default Messages;
 
-// Note: In a more advanced application, you might want to consider:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Wish List:
 // - Implementing virtualization for large lists of messages (e.g., react-window)
-// - Adding the ability to group direct messages (e.g., favorites, recent)
-// - Implementing message threading or replies within a direct message
+// - Adding the ability to filter messages (e.g., by date, sender, or content)
+// - Implementing message threading or replies
 // - Adding rich media support (e.g., emoji reactions, file attachments)
-// - Implementing real-time updates for new messages or status changes
+// - Implementing real-time updates for new messages
+// - Adding read/unread status for messages

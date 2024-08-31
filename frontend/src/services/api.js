@@ -7,58 +7,44 @@ const api = axios.create({
   baseURL: API_BASE_URL,
 });
 
-// API call for channels
-export const getChannels = async () => {
+// Helper function to make authenticated API calls
+const authenticatedGet = async (endpoint) => {
   try {
-    const response = await api.get('/channels/1', {
+    const response = await api.get(endpoint, {
       headers: {
         Authorization: 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTcyNDk4NDk0MiwiYXV0aCI6IlJPTEVfQURNSU4gUk9MRV9VU0VSIiwiaWF0IjoxNzI0ODk4NTQyfQ.xffQj9bQh9rFQOJU8wrxauBNYNDyGHESffSVUUduYg4tcv84_P1NyFsKt0BvCUBmOQJrghsKp0vS2aTvpBtmAQ'
       }
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching channels:', error);
+    console.error(`Error fetching data from ${endpoint}:`, error);
     throw error;
   }
 };
 
+// API call for channels
+export const getChannels = () => authenticatedGet('/channels/1');
 
-
-
-
-
-
-
-
-
-
-// TODO: Update these functions to use real API calls when ready
-export const getNotifications = () => {
-  // Return mock data for now
-  return Promise.resolve([
-    { id: 1, message: 'New message in #general' },
-    { id: 2, message: '@mention in #project-a' },
-    { id: 3, message: 'New direct message from Tim' },
-    { id: 4, message: 'Reply in thread #random' },
-  ]);
+// API call for notifications (placeholder for future implementation)
+export const getNotifications = async () => {
+  // TODO: Replace with actual API call when endpoint is ready
+  console.log('Notifications API call not yet implemented');
+  return [];
 };
 
-export const getDirectMessages = () => {
-  // Return mock data for now
-  return Promise.resolve([
-    { id: 1, name: 'Tim', unread: 2 },
-    { id: 2, name: 'Corye', unread: 0 },
-    { id: 3, name: 'Will', unread: 0 },
-    { id: 4, name: 'Ian', unread: 1 },
-  ]);
+// API call for messages (placeholder for future implementation)
+export const getMessages = async () => {
+  // TODO: Replace with actual API call when endpoint is ready
+  console.log('Messages API call not yet implemented');
+  return [];
 };
 
 export default api;
 
+// When we have the .jsx files for messages and notifications:
+// Update the getNotifications and getMessages functions to use authenticatedGet with the appropriate endpoints.
 
-
-
-// The getChannels function now fetches data from the local JHipster backend.
 // TODO: 
-// Update getNotifications and getDirectMessages to use real API calls when endpoints are ready.
-// Implement error handling and potentially retry logic for failed requests.
+// Implement proper token management instead of hardcoding the token.
+// Add error handling and potentially retry logic for failed requests.
+// Consider adding an interceptor to refresh the token if it expires.

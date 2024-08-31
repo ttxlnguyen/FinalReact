@@ -1,47 +1,41 @@
 import { useState, useEffect } from 'react';
-import { getNotifications, getDirectMessages } from '../services/api';
+import { getChannels, getNotifications, getMessages } from '../services/api';
 
-// Custom hook for managing application data
-// This hook fetches and manages notifications and direct messages
 function useAppData() {
-  // State for storing fetched data
+  const [channels, setChannels] = useState([]);
   const [notifications, setNotifications] = useState([]);
-  const [directMessages, setDirectMessages] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // State for selected channel and direct message
-  const [selectedChannel, setSelectedChannel] = useState(null);
-  const [selectedDirectMessage, setSelectedDirectMessage] = useState(null);
-
-  // Effect hook to fetch data when the component mounts
   useEffect(() => {
-    const fetchData = async () => {
-      // Fetch notifications and direct messages from the API
-      const notificationsData = await getNotifications();
-      const directMessagesData = await getDirectMessages();
+    async function fetchData() {
+      try {
+        setLoading(true);
+        const channelsData = await getChannels();
+        const notificationsData = await getNotifications();
+        const messagesData = await getMessages();
 
-      // Update state with fetched data
-      setNotifications(notificationsData);
-      setDirectMessages(directMessagesData);
-    };
+        setChannels(channelsData);
+        setNotifications(notificationsData);
+        setMessages(messagesData);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
 
     fetchData();
   }, []);
 
-  // Return the state and setter functions
-  return {
-    notifications,
-    directMessages,
-    selectedChannel,
-    setSelectedChannel,
-    selectedDirectMessage,
-    setSelectedDirectMessage,
-  };
+  return { channels, notifications, messages, loading, error };
 }
 
 export default useAppData;
 
-// Note: This hook no longer manages channels data, as that's now handled directly in the Channels component.
-// When integrating with the JHipster backend:
-// 1. Ensure that the getNotifications and getDirectMessages functions in api.js are updated to use real API calls.
-// 2. Add any necessary error handling or loading states as needed.
-// 3. Consider adding pagination or infinite scrolling for large datasets.
+// The useAppData hook prepares the structure for fetching channels, notifications, and messages.
+// When our backend endpoints are ready:
+// 1. Update the API functions in api.js to make real API calls.
+// 2. The data will automatically be fetched and stored in the respective state variables.
+// 3. You can then use this data in your components by calling useAppData().

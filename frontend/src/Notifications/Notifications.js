@@ -18,7 +18,7 @@ function Notifications({ notifications }) {
         ))}
       </ul>
       {/* 
-        You could add additional UI elements here, such as:
+        After MVP we should consider:
         - A "Mark all as read" button
         - Notification categories or filters
         - Timestamp for each notification
@@ -29,7 +29,7 @@ function Notifications({ notifications }) {
 
 export default Notifications;
 
-// Note: In a more complex application, you might want to add additional features such as:
+// Wish List:
 // - Pagination or infinite scrolling for large numbers of notifications
 // - Ability to dismiss individual notifications
 // - Different styling for read vs unread notifications
