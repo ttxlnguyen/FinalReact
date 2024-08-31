@@ -1,54 +1,34 @@
 import { useState, useEffect } from 'react';
-import { getChannels, getNotifications, getDirectMessages } from '../services/api';
+import { getNotifications, getDirectMessages } from '../services/api';
 
 // Custom hook for managing application data
-// Hooks are functions that let you "hook into" React state and lifecycle features from function components.
-// They allow you to use state and other React features without writing a class.
-//
-// This custom hook (useAppData) encapsulates the logic for fetching and managing 
-// channels, notifications, and direct messages. It uses the built-in useState and useEffect hooks.
-//
-// useState: Allows functional components to manage state.
-// useEffect: Allows performing side effects in functional components. It's similar to 
-//            componentDidMount, componentDidUpdate, and componentWillUnmount combined.
+// This hook fetches and manages notifications and direct messages
 function useAppData() {
-  // useState hook: Creates state variables and their setter functions
   // State for storing fetched data
-  const [channels, setChannels] = useState([]); // Initialize channels as an empty array
-  const [notifications, setNotifications] = useState([]); // Initialize notifications as an empty array
-  const [directMessages, setDirectMessages] = useState([]); // Initialize directMessages as an empty array
+  const [notifications, setNotifications] = useState([]);
+  const [directMessages, setDirectMessages] = useState([]);
 
   // State for selected channel and direct message
   const [selectedChannel, setSelectedChannel] = useState(null);
   const [selectedDirectMessage, setSelectedDirectMessage] = useState(null);
 
-  // useEffect hook: Performs side effects in functional components
-  // This effect runs after the component mounts (similar to componentDidMount)
+  // Effect hook to fetch data when the component mounts
   useEffect(() => {
     const fetchData = async () => {
-      // Fetch channels, notifications, and direct messages from the API
-      const channelsData = await getChannels();
+      // Fetch notifications and direct messages from the API
       const notificationsData = await getNotifications();
       const directMessagesData = await getDirectMessages();
 
-      // Update state with fetched data using the setter functions
-      setChannels(channelsData);
+      // Update state with fetched data
       setNotifications(notificationsData);
       setDirectMessages(directMessagesData);
-
-      // Set default selected channel to the first channel if available
-      if (channelsData.length > 0) {
-        setSelectedChannel(channelsData[0]);
-      }
     };
 
     fetchData();
-  }, []); // Empty dependency array means this effect runs once on mount
+  }, []);
 
   // Return the state and setter functions
-  // This allows components using this hook to access and modify the data
   return {
-    channels,
     notifications,
     directMessages,
     selectedChannel,
@@ -59,3 +39,9 @@ function useAppData() {
 }
 
 export default useAppData;
+
+// Note: This hook no longer manages channels data, as that's now handled directly in the Channels component.
+// When integrating with the JHipster backend:
+// 1. Ensure that the getNotifications and getDirectMessages functions in api.js are updated to use real API calls.
+// 2. Add any necessary error handling or loading states as needed.
+// 3. Consider adding pagination or infinite scrolling for large datasets.

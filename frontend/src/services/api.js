@@ -1,10 +1,5 @@
-// This file will be used for setting up API calls to the JHipster backend in the future.
-// When you're ready to integrate with JHipster, uncomment and modify the code below as needed.
-
-/*
 import axios from 'axios';
 
-// TODO: Update this with your JHipster backend URL when ready
 const API_BASE_URL = 'http://localhost:8080/api';
 
 // Create an axios instance with the base URL
@@ -12,27 +7,32 @@ const api = axios.create({
   baseURL: API_BASE_URL,
 });
 
-// Example API calls - modify these to match your JHipster API endpoints
-export const getChannels = () => api.get('/channels');
-export const getNotifications = () => api.get('/notifications');
-export const getDirectMessages = () => api.get('/messages');
-
-export default api;
-*/
-
-// For now, you can use this file to define mock data or placeholder functions
-// that will be replaced with actual API calls in the future.
-
-export const getChannels = () => {
-  // Return mock data for now
-  return Promise.resolve([
-    { id: 1, name: 'general' },
-    { id: 2, name: 'random' },
-    { id: 3, name: 'project-a' },
-    { id: 4, name: 'project-b' },
-  ]);
+// API call for channels
+export const getChannels = async () => {
+  try {
+    const response = await api.get('/channels/1', {
+      headers: {
+        Authorization: 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTcyNDk4NDk0MiwiYXV0aCI6IlJPTEVfQURNSU4gUk9MRV9VU0VSIiwiaWF0IjoxNzI0ODk4NTQyfQ.xffQj9bQh9rFQOJU8wrxauBNYNDyGHESffSVUUduYg4tcv84_P1NyFsKt0BvCUBmOQJrghsKp0vS2aTvpBtmAQ'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching channels:', error);
+    throw error;
+  }
 };
 
+
+
+
+
+
+
+
+
+
+
+// TODO: Update these functions to use real API calls when ready
 export const getNotifications = () => {
   // Return mock data for now
   return Promise.resolve([
@@ -53,9 +53,12 @@ export const getDirectMessages = () => {
   ]);
 };
 
-// TODO: When ready to integrate with JHipster:
-// 1. Install axios: npm install axios
-// 2. Uncomment the axios import and API setup code at the top of this file
-// 3. Update the API_BASE_URL to match your JHipster backend URL
-// 4. Modify the API call functions to match your JHipster API endpoints
-// 5. Remove the mock data functions and use the actual API calls in your components
+export default api;
+
+
+
+
+// The getChannels function now fetches data from the local JHipster backend.
+// TODO: 
+// Update getNotifications and getDirectMessages to use real API calls when endpoints are ready.
+// Implement error handling and potentially retry logic for failed requests.

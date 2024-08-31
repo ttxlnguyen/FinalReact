@@ -13,11 +13,10 @@ import useAppData from './hooks/useAppData';
 function App() {
   // Use custom hook to manage app data
   // Hooks allow us to use state and other React features without writing a class
-  // useAppData is a custom hook that fetches and manages channels, notifications, and direct messages
+  // useAppData is a custom hook that fetches and manages notifications and direct messages
   const {
-    channels,
-    notifications,
-    directMessages,
+    notifications, // TO BE REMOVED
+    directMessages, // TO BE REMOVED
     selectedChannel,
     setSelectedChannel,
     selectedDirectMessage,
@@ -103,7 +102,7 @@ function App() {
       />
 
       {/* Channel list - visible when isChannelListOpen is true */}
-      {isChannelListOpen && <Channels channels={channels} handleChannelSelect={handleChannelSelect} />}
+      {isChannelListOpen && <Channels handleChannelSelect={handleChannelSelect} />}
 
       {/* Notifications list - visible when isNotificationsOpen is true */}
       {isNotificationsOpen && <Notifications notifications={notifications} />}
