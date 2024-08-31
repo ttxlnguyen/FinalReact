@@ -1,60 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 // Import components
 import Sidebar from './components/Sidebar';
-import Notifications from './Notifications/Notifications';
 import Channels from './Channels/Channels';
-import Messages from './Messages/Messages';
 import MessageList from './components/MessageList';
 import MessageInput from './components/MessageInput';
-// Import custom hook
+import Login from './components/Login';
+// Import custom hook and auth functions
 import useAppData from './hooks/useAppData';
+import { isAuthenticated, logout } from './services/auth';
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
+
   // Use custom hook to manage app data
   const {
     channels,
-    notifications,
     messages,
+    loading,
+    error,
+    selectChannel,
+    selectedChannelId
   } = useAppData();
 
   // Local state
-  const [selectedChannel, setSelectedChannel] = useState(null);
-  const [selectedDirectMessage, setSelectedDirectMessage] = useState(null);
   const [isChannelListOpen, setIsChannelListOpen] = useState(false);
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [isMessagesOpen, setIsMessagesOpen] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
 
-  // Toggle functions for sidebar items
+  useEffect(() => {
+    setIsLoggedIn(isAuthenticated());
+  }, []);
+
+  // Toggle function for sidebar items
   const toggleChannelList = () => {
     setIsChannelListOpen(!isChannelListOpen);
-    setIsNotificationsOpen(false);
-    setIsMessagesOpen(false);
-  };
-
-  const toggleNotifications = () => {
-    setIsNotificationsOpen(!isNotificationsOpen);
-    setIsChannelListOpen(false);
-    setIsMessagesOpen(false);
-  };
-
-  const toggleMessages = () => {
-    setIsMessagesOpen(!isMessagesOpen);
-    setIsChannelListOpen(false);
-    setIsNotificationsOpen(false);
   };
 
   // Function to handle channel selection
-  const handleChannelSelect = (channel) => {
-    setSelectedChannel(channel);
-    setSelectedDirectMessage(null);
-  };
-
-  // Function to handle direct message selection
-  const handleDirectMessageSelect = (message) => {
-    setSelectedDirectMessage(message);
-    setSelectedChannel(null);
+  const handleChannelSelect = (channelId) => {
+    selectChannel(channelId);
+    setIsChannelListOpen(false);
   };
 
   // Function to handle input change in the message input field
@@ -72,46 +57,59 @@ function App() {
     }
   };
 
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    logout();
+    setIsLoggedIn(false);
+  };
+
+  if (!isLoggedIn) {
+    return <Login onLoginSuccess={handleLoginSuccess} />;
+  }
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
     <div className="App">
       <Sidebar
-        toggleNotifications={toggleNotifications}
         toggleChannelList={toggleChannelList}
-        toggleMessages={toggleMessages}
       />
 
+      <button onClick={handleLogout}>Logout</button>
+
       {isChannelListOpen && <Channels channels={channels} handleChannelSelect={handleChannelSelect} />}
-      {isNotificationsOpen && <Notifications notifications={notifications} />}
-      {isMessagesOpen && <Messages messages={messages} handleDirectMessageSelect={handleDirectMessageSelect} />}
 
       <div className="main-content">
         <header className="main-header">
-          <h1>{selectedChannel ? `# ${selectedChannel.name}` : selectedDirectMessage ? `${selectedDirectMessage.sender}` : 'Select a channel or message'}</h1>
-          <p>{selectedChannel ? 'Channel chat' : selectedDirectMessage ? 'Direct message' : 'Please select a channel or direct message to start chatting'}</p>
+          <h1>{selectedChannelId ? `# ${channels.find(c => c.id === selectedChannelId)?.name}` : 'Select a channel'}</h1>
+          <p>{selectedChannelId ? 'Channel chat' : 'Please select a channel to start chatting'}</p>
         </header>
         
-        <MessageList
-          messages={messages}
-          selectedChannel={selectedChannel}
-          selectedDirectMessage={selectedDirectMessage}
-        />
-        
-        <MessageInput
-          inputMessage={inputMessage}
-          handleInputChange={handleInputChange}
-          handleMessageSubmit={handleMessageSubmit}
-        />
+        {selectedChannelId && (
+          <>
+            <MessageList
+              messages={messages}
+            />
+            
+            <MessageInput
+              inputMessage={inputMessage}
+              handleInputChange={handleInputChange}
+              handleMessageSubmit={handleMessageSubmit}
+            />
+          </>
+        )}
       </div>
     </div>
   );
 }
 
 export default App;
-
-// App.js uses data from useAppData, but keeps message handling local.
-// When we integrate with the backend we need to:
-// 1. Implement a sendMessage function in useAppData and update handleMessageSubmit to use it.
-// 2. Add loading and error states from useAppData when they're implemented.
-// 3. Update the Channels, Notifications, and Messages components as needed.
-// 4. Implement proper error handling and loading states in the UI as needed.
-

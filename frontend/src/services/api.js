@@ -1,50 +1,80 @@
 import axios from 'axios';
+import { getAuthToken } from './auth';
 
 const API_BASE_URL = 'http://localhost:8080/api';
 
-// Create an axios instance with the base URL
-const api = axios.create({
+// Create an axios instance
+const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
+  withCredentials: true, // This is important for CORS with credentials
 });
 
-// Helper function to make authenticated API calls
-const authenticatedGet = async (endpoint) => {
+// Add a request interceptor
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = getAuthToken();
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    console.log('Making request to:', config.url);
+    return config;
+  },
+  (error) => {
+    console.error('Request error:', error);
+    return Promise.reject(error);
+  }
+);
+
+// Add a response interceptor
+axiosInstance.interceptors.response.use(
+  (response) => {
+    console.log('Received response from:', response.config.url);
+    return response;
+  },
+  (error) => {
+    if (error.response) {
+      console.error('API call error:', error.response.data);
+    } else {
+      console.error('API call error:', error.message);
+    }
+    return Promise.reject(error);
+  }
+);
+
+// Simple function to make API calls
+const apiCall = async (endpoint, method = 'GET', body = null) => {
   try {
-    const response = await api.get(endpoint, {
-      headers: {
-        Authorization: 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTcyNDk4NDk0MiwiYXV0aCI6IlJPTEVfQURNSU4gUk9MRV9VU0VSIiwiaWF0IjoxNzI0ODk4NTQyfQ.xffQj9bQh9rFQOJU8wrxauBNYNDyGHESffSVUUduYg4tcv84_P1NyFsKt0BvCUBmOQJrghsKp0vS2aTvpBtmAQ'
-      }
-    });
+    const config = {
+      method,
+      url: endpoint,
+    };
+
+    if (body) {
+      config.data = body;
+    }
+
+    const response = await axiosInstance(config);
     return response.data;
   } catch (error) {
-    console.error(`Error fetching data from ${endpoint}:`, error);
+    console.error('API call error:', error.message);
     throw error;
   }
 };
 
-// API call for channels
-export const getChannels = () => authenticatedGet('/channels/1');
-
-// API call for notifications (placeholder for future implementation)
-export const getNotifications = async () => {
-  // TODO: Replace with actual API call when endpoint is ready
-  console.log('Notifications API call not yet implemented');
-  return [];
+// API functions
+export const getAccount = () => apiCall('/account');
+export const getChannels = () => apiCall('/channels');
+export const getChannel = (id) => apiCall(`/channels/${id}`);
+export const getMessages = (channelId) => {
+  if (!channelId) {
+    throw new Error('Channel ID is required to fetch messages');
+  }
+  return apiCall(`/channels/${channelId}/messages`);
 };
 
-// API call for messages (placeholder for future implementation)
-export const getMessages = async () => {
-  // TODO: Replace with actual API call when endpoint is ready
-  console.log('Messages API call not yet implemented');
-  return [];
+export default {
+  getAccount,
+  getChannels,
+  getChannel,
+  getMessages,
 };
-
-export default api;
-
-// When we have the .jsx files for messages and notifications:
-// Update the getNotifications and getMessages functions to use authenticatedGet with the appropriate endpoints.
-
-// TODO: 
-// Implement proper token management instead of hardcoding the token.
-// Add error handling and potentially retry logic for failed requests.
-// Consider adding an interceptor to refresh the token if it expires.

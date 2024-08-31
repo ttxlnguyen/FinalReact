@@ -1,41 +1,61 @@
-import { useState, useEffect } from 'react';
-import { getChannels, getNotifications, getMessages } from '../services/api';
+import { useState, useEffect, useCallback } from 'react';
+import { getChannels, getMessages } from '../services/api';
+import { isAuthenticated } from '../services/auth';
 
 function useAppData() {
   const [channels, setChannels] = useState([]);
-  const [notifications, setNotifications] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [selectedChannelId, setSelectedChannelId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true);
-        const channelsData = await getChannels();
-        const notificationsData = await getNotifications();
-        const messagesData = await getMessages();
-
-        setChannels(channelsData);
-        setNotifications(notificationsData);
-        setMessages(messagesData);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
+  const fetchChannels = useCallback(async () => {
+    try {
+      const channelsData = await getChannels();
+      setChannels(channelsData);
+    } catch (err) {
+      setError('Failed to fetch channels: ' + err.message);
     }
-
-    fetchData();
   }, []);
 
-  return { channels, notifications, messages, loading, error };
+  const fetchMessages = useCallback(async (channelId) => {
+    if (!channelId) return;
+    try {
+      const messagesData = await getMessages(channelId);
+      setMessages(messagesData);
+    } catch (err) {
+      setError('Failed to fetch messages: ' + err.message);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    fetchChannels().finally(() => setLoading(false));
+  }, [fetchChannels]);
+
+  useEffect(() => {
+    if (selectedChannelId) {
+      fetchMessages(selectedChannelId);
+    }
+  }, [selectedChannelId, fetchMessages]);
+
+  const selectChannel = (channelId) => {
+    setSelectedChannelId(channelId);
+  };
+
+  return { 
+    channels, 
+    messages, 
+    loading, 
+    error, 
+    selectChannel,
+    selectedChannelId
+  };
 }
 
 export default useAppData;
-
-// The useAppData hook prepares the structure for fetching channels, notifications, and messages.
-// When our backend endpoints are ready:
-// 1. Update the API functions in api.js to make real API calls.
-// 2. The data will automatically be fetched and stored in the respective state variables.
-// 3. You can then use this data in your components by calling useAppData().
