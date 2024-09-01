@@ -67,7 +67,9 @@ export const getChannels = () => apiCall('/channels');
 export const getChannel = (id) => apiCall(`/channels/${id}`);
 export const getMessages = () => apiCall('/messages');
 export const getMessage = (id) => apiCall(`/messages/${id}`);
-export const getChannelMessages = (channelId) => apiCall(`/channels/${channelId}/messages`);
+export const getChannelMessages = (channelId) => apiCall(`/messages?channelId=${channelId}`);
+export const sendMessage = (channelId, content) => apiCall('/messages', 'POST', { channelId, content });
+export const getUsers = () => apiCall('/users');
 
 export default {
   getAccount,
@@ -76,4 +78,6 @@ export default {
   getMessages,
   getMessage,
   getChannelMessages,
+  sendMessage,
+  getUsers,
 };

@@ -1,30 +1,28 @@
 import React from 'react';
 
-// MessageList component
-// This component displays the list of messages in the current conversation
-// It also shows appropriate system messages based on the selected channel or direct message
-function MessageList({ messages, selectedChannel, selectedDirectMessage }) {
+function MessageList({ messages, currentUser, selectedUser }) {
+  if (!selectedUser || !messages) {
+    return null;
+  }
+
+  const filteredMessages = messages.filter(message => 
+    ((message.senderId === selectedUser.id && message.receiverId === currentUser.id) ||
+    (message.senderId === currentUser.id && message.receiverId === selectedUser.id)) &&
+    !message.deleted
+  );
+
   return (
     <div className="message-list">
-      {/* Display messages */}
-      {messages.map(message => (
-        <div key={message.id} className="message">
-          <strong>{message.sender}:</strong> {message.text}
-          <span className="timestamp">{message.timestamp}</span>
-        </div>
-      ))}
-      {/* Display a message when there are no messages in a selected channel or direct message */}
-      {messages.length === 0 && (selectedChannel || selectedDirectMessage) && (
-        <div className="message">
-          <strong>System:</strong> No messages yet. Start the conversation!
-        </div>
-      )}
-      {/* Display a message when no channel or direct message is selected */}
-      {!selectedChannel && !selectedDirectMessage && (
-        <div className="message">
-          <strong>System:</strong> Select a channel or direct message to view the conversation.
-        </div>
-      )}
+      <h2>Conversation with {selectedUser.username}</h2>
+      <ul>
+        {filteredMessages.map(message => (
+          <li key={message.id} className={message.senderId === currentUser.id ? 'sent' : 'received'}>
+            <strong>{message.senderId === currentUser.id ? 'You' : selectedUser.username}</strong>
+            <p>{message.content}</p>
+            <small>{new Date(message.sentAt).toLocaleString()}</small>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

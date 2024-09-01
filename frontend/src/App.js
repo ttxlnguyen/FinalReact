@@ -18,20 +18,31 @@ function App() {
   const {
     channels,
     messages,
+    users,
     loading,
     error,
     selectChannel,
-    selectedChannelId
+    selectedChannelId,
+    setSelectedChannelId,
+    sendMessage,
+    fetchMessages
   } = useAppData();
 
   // Local state
   const [isChannelListOpen, setIsChannelListOpen] = useState(false);
   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
+  const [selectedUserId, setSelectedUserId] = useState(null);
 
   useEffect(() => {
     setIsLoggedIn(isAuthenticated());
   }, []);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchMessages();
+    }
+  }, [isLoggedIn, fetchMessages]);
 
   // Toggle functions for sidebar items
   const toggleChannelList = () => {
@@ -42,18 +53,22 @@ function App() {
   const toggleMessages = () => {
     setIsMessagesOpen(!isMessagesOpen);
     setIsChannelListOpen(false);
+    setSelectedChannelId(null);
+    setSelectedUserId(null);
+    fetchMessages();
   };
 
   // Function to handle channel selection
   const handleChannelSelect = (channelId) => {
     selectChannel(channelId);
     setIsChannelListOpen(false);
+    setSelectedUserId(null);
   };
 
-  // Function to handle direct message selection
-  const handleDirectMessageSelect = (message) => {
-    // TODO: Implement direct message selection
-    console.log('Selected message:', message);
+  // Function to handle user selection for direct messages
+  const handleUserSelect = (userId) => {
+    setSelectedUserId(userId);
+    setSelectedChannelId(null);
     setIsMessagesOpen(false);
   };
 
@@ -66,8 +81,12 @@ function App() {
   const handleMessageSubmit = (e) => {
     e.preventDefault();
     if (inputMessage.trim() !== '') {
-      // TODO: Implement actual message sending logic when backend is ready
-      console.log('Sending message:', inputMessage);
+      if (selectedChannelId) {
+        sendMessage(selectedChannelId, inputMessage);
+      } else if (selectedUserId) {
+        // TODO: Implement sending direct messages
+        console.log('Sending direct message to user:', selectedUserId, 'Message:', inputMessage);
+      }
       setInputMessage('');
     }
   };
@@ -93,6 +112,8 @@ function App() {
     return <div>Error: {error}</div>;
   }
 
+  const currentUser = users.find(user => user.id === isAuthenticated());
+
   return (
     <div className="App">
       <Sidebar
@@ -103,27 +124,31 @@ function App() {
       <button onClick={handleLogout}>Logout</button>
 
       {isChannelListOpen && <Channels channels={channels} handleChannelSelect={handleChannelSelect} />}
-      {isMessagesOpen && <Messages handleDirectMessageSelect={handleDirectMessageSelect} />}
+      {isMessagesOpen && <Messages messages={messages} currentUser={currentUser} onSelectUser={handleUserSelect} />}
 
       <div className="main-content">
         <header className="main-header">
-          <h1>{selectedChannelId ? `# ${channels.find(c => c.id === selectedChannelId)?.name}` : 'Select a channel'}</h1>
-          <p>{selectedChannelId ? 'Channel chat' : 'Please select a channel to start chatting'}</p>
+          <h1>
+            {selectedChannelId 
+              ? `# ${channels.find(c => c.id === selectedChannelId)?.name}`
+              : selectedUserId
+                ? `Chat with ${users.find(u => u.id === selectedUserId)?.username}`
+                : 'Select a channel or user'
+            }
+          </h1>
         </header>
         
-        {selectedChannelId && (
-          <>
-            <MessageList
-              messages={messages}
-            />
-            
-            <MessageInput
-              inputMessage={inputMessage}
-              handleInputChange={handleInputChange}
-              handleMessageSubmit={handleMessageSubmit}
-            />
-          </>
-        )}
+        <MessageList 
+          messages={messages} 
+          currentUser={currentUser}
+          selectedUser={users.find(u => u.id === selectedUserId)}
+        />
+        
+        <MessageInput
+          inputMessage={inputMessage}
+          handleInputChange={handleInputChange}
+          handleMessageSubmit={handleMessageSubmit}
+        />
       </div>
     </div>
   );
