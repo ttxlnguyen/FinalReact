@@ -3,6 +3,7 @@ import './App.css';
 // Import components
 import Sidebar from './components/Sidebar';
 import Channels from './Channels/Channels';
+import Messages from './Messages/Messages';
 import MessageList from './components/MessageList';
 import MessageInput from './components/MessageInput';
 import Login from './components/Login';
@@ -25,21 +26,35 @@ function App() {
 
   // Local state
   const [isChannelListOpen, setIsChannelListOpen] = useState(false);
+  const [isMessagesOpen, setIsMessagesOpen] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
 
   useEffect(() => {
     setIsLoggedIn(isAuthenticated());
   }, []);
 
-  // Toggle function for sidebar items
+  // Toggle functions for sidebar items
   const toggleChannelList = () => {
     setIsChannelListOpen(!isChannelListOpen);
+    setIsMessagesOpen(false);
+  };
+
+  const toggleMessages = () => {
+    setIsMessagesOpen(!isMessagesOpen);
+    setIsChannelListOpen(false);
   };
 
   // Function to handle channel selection
   const handleChannelSelect = (channelId) => {
     selectChannel(channelId);
     setIsChannelListOpen(false);
+  };
+
+  // Function to handle direct message selection
+  const handleDirectMessageSelect = (message) => {
+    // TODO: Implement direct message selection
+    console.log('Selected message:', message);
+    setIsMessagesOpen(false);
   };
 
   // Function to handle input change in the message input field
@@ -82,11 +97,13 @@ function App() {
     <div className="App">
       <Sidebar
         toggleChannelList={toggleChannelList}
+        toggleMessages={toggleMessages}
       />
 
       <button onClick={handleLogout}>Logout</button>
 
       {isChannelListOpen && <Channels channels={channels} handleChannelSelect={handleChannelSelect} />}
+      {isMessagesOpen && <Messages handleDirectMessageSelect={handleDirectMessageSelect} />}
 
       <div className="main-content">
         <header className="main-header">

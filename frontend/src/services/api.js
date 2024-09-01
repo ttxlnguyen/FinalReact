@@ -65,16 +65,15 @@ const apiCall = async (endpoint, method = 'GET', body = null) => {
 export const getAccount = () => apiCall('/account');
 export const getChannels = () => apiCall('/channels');
 export const getChannel = (id) => apiCall(`/channels/${id}`);
-export const getMessages = (channelId) => {
-  if (!channelId) {
-    throw new Error('Channel ID is required to fetch messages');
-  }
-  return apiCall(`/channels/${channelId}/messages`);
-};
+export const getMessages = () => apiCall('/messages');
+export const getMessage = (id) => apiCall(`/messages/${id}`);
+export const getChannelMessages = (channelId) => apiCall(`/channels/${channelId}/messages`);
 
 export default {
   getAccount,
   getChannels,
   getChannel,
   getMessages,
+  getMessage,
+  getChannelMessages,
 };
