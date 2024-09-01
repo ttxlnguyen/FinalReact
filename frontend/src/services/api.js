@@ -1,61 +1,83 @@
-// This file will be used for setting up API calls to the JHipster backend in the future.
-// When you're ready to integrate with JHipster, uncomment and modify the code below as needed.
-
-/*
 import axios from 'axios';
+import { getAuthToken } from './auth';
 
-// TODO: Update this with your JHipster backend URL when ready
 const API_BASE_URL = 'http://localhost:8080/api';
 
-// Create an axios instance with the base URL
-const api = axios.create({
+// Create an axios instance
+const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
+  withCredentials: true, // This is important for CORS with credentials
 });
 
-// Example API calls - modify these to match your JHipster API endpoints
-export const getChannels = () => api.get('/channels');
-export const getNotifications = () => api.get('/notifications');
-export const getDirectMessages = () => api.get('/messages');
+// Add a request interceptor
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = getAuthToken();
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    console.log('Making request to:', config.url);
+    return config;
+  },
+  (error) => {
+    console.error('Request error:', error);
+    return Promise.reject(error);
+  }
+);
 
-export default api;
-*/
+// Add a response interceptor
+axiosInstance.interceptors.response.use(
+  (response) => {
+    console.log('Received response from:', response.config.url);
+    return response;
+  },
+  (error) => {
+    if (error.response) {
+      console.error('API call error:', error.response.data);
+    } else {
+      console.error('API call error:', error.message);
+    }
+    return Promise.reject(error);
+  }
+);
 
-// For now, you can use this file to define mock data or placeholder functions
-// that will be replaced with actual API calls in the future.
+// Simple function to make API calls
+const apiCall = async (endpoint, method = 'GET', body = null) => {
+  try {
+    const config = {
+      method,
+      url: endpoint,
+    };
 
-export const getChannels = () => {
-  // Return mock data for now
-  return Promise.resolve([
-    { id: 1, name: 'general' },
-    { id: 2, name: 'random' },
-    { id: 3, name: 'project-a' },
-    { id: 4, name: 'project-b' },
-  ]);
+    if (body) {
+      config.data = body;
+    }
+
+    const response = await axiosInstance(config);
+    return response.data;
+  } catch (error) {
+    console.error('API call error:', error.message);
+    throw error;
+  }
 };
 
-export const getNotifications = () => {
-  // Return mock data for now
-  return Promise.resolve([
-    { id: 1, message: 'New message in #general' },
-    { id: 2, message: '@mention in #project-a' },
-    { id: 3, message: 'New direct message from Tim' },
-    { id: 4, message: 'Reply in thread #random' },
-  ]);
-};
+// API functions
+export const getAccount = () => apiCall('/account');
+export const getChannels = () => apiCall('/channels');
+export const getChannel = (id) => apiCall(`/channels/${id}`);
+export const getMessages = () => apiCall('/messages');
+export const getMessage = (id) => apiCall(`/messages/${id}`);
+export const getChannelMessages = (channelId) => apiCall(`/messages?channelId=${channelId}`);
+export const sendMessage = (channelId, content) => apiCall('/messages', 'POST', { channelId, content });
+export const getUsers = () => apiCall('/users');
 
-export const getDirectMessages = () => {
-  // Return mock data for now
-  return Promise.resolve([
-    { id: 1, name: 'Tim', unread: 2 },
-    { id: 2, name: 'Corye', unread: 0 },
-    { id: 3, name: 'Will', unread: 0 },
-    { id: 4, name: 'Ian', unread: 1 },
-  ]);
+export default {
+  getAccount,
+  getChannels,
+  getChannel,
+  getMessages,
+  getMessage,
+  getChannelMessages,
+  sendMessage,
+  getUsers,
 };
-
-// TODO: When ready to integrate with JHipster:
-// 1. Install axios: npm install axios
-// 2. Uncomment the axios import and API setup code at the top of this file
-// 3. Update the API_BASE_URL to match your JHipster backend URL
-// 4. Modify the API call functions to match your JHipster API endpoints
-// 5. Remove the mock data functions and use the actual API calls in your components

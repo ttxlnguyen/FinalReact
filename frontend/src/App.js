@@ -1,75 +1,75 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 // Import components
 import Sidebar from './components/Sidebar';
-import Notifications from './Notifications/Notifications';
 import Channels from './Channels/Channels';
 import Messages from './Messages/Messages';
 import MessageList from './components/MessageList';
 import MessageInput from './components/MessageInput';
-// Import custom hook
+import Login from './components/Login';
+// Import custom hook and auth functions
 import useAppData from './hooks/useAppData';
+import { isAuthenticated, logout } from './services/auth';
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
+
   // Use custom hook to manage app data
-  // Hooks allow us to use state and other React features without writing a class
-  // useAppData is a custom hook that fetches and manages channels, notifications, and direct messages
   const {
     channels,
-    notifications,
-    directMessages,
-    selectedChannel,
-    setSelectedChannel,
-    selectedDirectMessage,
-    setSelectedDirectMessage,
+    messages,
+    users,
+    loading,
+    error,
+    selectChannel,
+    selectedChannelId,
+    setSelectedChannelId,
+    sendMessage,
+    fetchMessages
   } = useAppData();
 
-  // useState is a hook that lets you add React state to function components
-  // Here we use it to manage the visibility of sidebar items and the current input message
-
-  // State variables to control the visibility of each sidebar list
+  // Local state
   const [isChannelListOpen, setIsChannelListOpen] = useState(false);
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
-
-  // State for the current input message
   const [inputMessage, setInputMessage] = useState('');
+  const [selectedUserId, setSelectedUserId] = useState(null);
 
-  // State to store all messages in the current conversation
-  const [messages, setMessages] = useState([]);
+  useEffect(() => {
+    setIsLoggedIn(isAuthenticated());
+  }, []);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchMessages();
+    }
+  }, [isLoggedIn, fetchMessages]);
 
   // Toggle functions for sidebar items
-  // These functions ensure only one list is open at a time
   const toggleChannelList = () => {
     setIsChannelListOpen(!isChannelListOpen);
-    setIsNotificationsOpen(false);
-    setIsMessagesOpen(false);
-  };
-
-  const toggleNotifications = () => {
-    setIsNotificationsOpen(!isNotificationsOpen);
-    setIsChannelListOpen(false);
     setIsMessagesOpen(false);
   };
 
   const toggleMessages = () => {
     setIsMessagesOpen(!isMessagesOpen);
     setIsChannelListOpen(false);
-    setIsNotificationsOpen(false);
+    setSelectedChannelId(null);
+    setSelectedUserId(null);
+    fetchMessages();
   };
 
   // Function to handle channel selection
-  // When a channel is selected, we clear any selected direct message
-  const handleChannelSelect = (channel) => {
-    setSelectedChannel(channel);
-    setSelectedDirectMessage(null);
+  const handleChannelSelect = (channelId) => {
+    selectChannel(channelId);
+    setIsChannelListOpen(false);
+    setSelectedUserId(null);
   };
 
-  // Function to handle direct message selection
-  // When a direct message is selected, we clear any selected channel
-  const handleDirectMessageSelect = (message) => {
-    setSelectedDirectMessage(message);
-    setSelectedChannel(null);
+  // Function to handle user selection for direct messages
+  const handleUserSelect = (userId) => {
+    setSelectedUserId(userId);
+    setSelectedChannelId(null);
+    setIsMessagesOpen(false);
   };
 
   // Function to handle input change in the message input field
@@ -78,61 +78,77 @@ function App() {
   };
 
   // Function to handle message submission
-  // This creates a new message object and adds it to the messages array
   const handleMessageSubmit = (e) => {
     e.preventDefault();
     if (inputMessage.trim() !== '') {
-      const newMessage = {
-        id: Date.now(),
-        text: inputMessage,
-        sender: 'You',
-        timestamp: new Date().toLocaleTimeString(),
-      };
-      setMessages([...messages, newMessage]);
+      if (selectedChannelId) {
+        sendMessage(selectedChannelId, inputMessage);
+      } else if (selectedUserId) {
+        // TODO: Implement sending direct messages
+        console.log('Sending direct message to user:', selectedUserId, 'Message:', inputMessage);
+      }
       setInputMessage('');
     }
   };
 
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    logout();
+    setIsLoggedIn(false);
+  };
+
+  if (!isLoggedIn) {
+    return <Login onLoginSuccess={handleLoginSuccess} />;
+  }
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  const currentUser = users.find(user => user.id === isAuthenticated());
+
   return (
     <div className="App">
-      {/* Sidebar component - contains navigation icons */}
       <Sidebar
-        toggleNotifications={toggleNotifications}
         toggleChannelList={toggleChannelList}
         toggleMessages={toggleMessages}
       />
 
-      {/* Channel list - visible when isChannelListOpen is true */}
+      <button onClick={handleLogout}>Logout</button>
+
       {isChannelListOpen && <Channels channels={channels} handleChannelSelect={handleChannelSelect} />}
+      {isMessagesOpen && <Messages messages={messages} currentUser={currentUser} onSelectUser={handleUserSelect} />}
 
-      {/* Notifications list - visible when isNotificationsOpen is true */}
-      {isNotificationsOpen && <Notifications notifications={notifications} />}
-
-      {/* Messages list - visible when isMessagesOpen is true */}
-      {isMessagesOpen && <Messages directMessages={directMessages} handleDirectMessageSelect={handleDirectMessageSelect} />}
-
-      {/* Main content area */}
       <div className="main-content">
         <header className="main-header">
-          <h1>{selectedChannel ? `# ${selectedChannel.name}` : selectedDirectMessage ? `${selectedDirectMessage.name}` : 'Select a channel or message'}</h1>
-          <p>{selectedChannel ? 'Channel chat' : selectedDirectMessage ? 'Direct message' : 'Please select a channel or direct message to start chatting'}</p>
+          <h1>
+            {selectedChannelId 
+              ? `# ${channels.find(c => c.id === selectedChannelId)?.name}`
+              : selectedUserId
+                ? `Chat with ${users.find(u => u.id === selectedUserId)?.username}`
+                : 'Select a channel or user'
+            }
+          </h1>
         </header>
         
-        {/* MessageList component - displays all messages in the current conversation */}
-        <MessageList
-          messages={messages}
-          selectedChannel={selectedChannel}
-          selectedDirectMessage={selectedDirectMessage}
+        <MessageList 
+          messages={messages} 
+          currentUser={currentUser}
+          selectedUser={users.find(u => u.id === selectedUserId)}
         />
         
-        {/* MessageInput component - allows user to type and send messages */}
-        {(selectedChannel || selectedDirectMessage) && (
-          <MessageInput
-            inputMessage={inputMessage}
-            handleInputChange={handleInputChange}
-            handleMessageSubmit={handleMessageSubmit}
-          />
-        )}
+        <MessageInput
+          inputMessage={inputMessage}
+          handleInputChange={handleInputChange}
+          handleMessageSubmit={handleMessageSubmit}
+        />
       </div>
     </div>
   );

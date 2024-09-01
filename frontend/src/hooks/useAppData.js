@@ -1,60 +1,89 @@
-import { useState, useEffect } from 'react';
-import { getChannels, getNotifications, getDirectMessages } from '../services/api';
+import { useState, useEffect, useCallback } from 'react';
+import { getChannels, getMessages, getChannelMessages, sendMessage as apiSendMessage, getUsers } from '../services/api';
+import { isAuthenticated } from '../services/auth';
 
-// Custom hook for managing application data
-// Hooks are functions that let you "hook into" React state and lifecycle features from function components.
-// They allow you to use state and other React features without writing a class.
-//
-// This custom hook (useAppData) encapsulates the logic for fetching and managing 
-// channels, notifications, and direct messages. It uses the built-in useState and useEffect hooks.
-//
-// useState: Allows functional components to manage state.
-// useEffect: Allows performing side effects in functional components. It's similar to 
-//            componentDidMount, componentDidUpdate, and componentWillUnmount combined.
 function useAppData() {
-  // useState hook: Creates state variables and their setter functions
-  // State for storing fetched data
-  const [channels, setChannels] = useState([]); // Initialize channels as an empty array
-  const [notifications, setNotifications] = useState([]); // Initialize notifications as an empty array
-  const [directMessages, setDirectMessages] = useState([]); // Initialize directMessages as an empty array
+  const [channels, setChannels] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [selectedChannelId, setSelectedChannelId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // State for selected channel and direct message
-  const [selectedChannel, setSelectedChannel] = useState(null);
-  const [selectedDirectMessage, setSelectedDirectMessage] = useState(null);
-
-  // useEffect hook: Performs side effects in functional components
-  // This effect runs after the component mounts (similar to componentDidMount)
-  useEffect(() => {
-    const fetchData = async () => {
-      // Fetch channels, notifications, and direct messages from the API
+  const fetchChannels = useCallback(async () => {
+    try {
       const channelsData = await getChannels();
-      const notificationsData = await getNotifications();
-      const directMessagesData = await getDirectMessages();
-
-      // Update state with fetched data using the setter functions
       setChannels(channelsData);
-      setNotifications(notificationsData);
-      setDirectMessages(directMessagesData);
+    } catch (err) {
+      setError('Failed to fetch channels: ' + err.message);
+    }
+  }, []);
 
-      // Set default selected channel to the first channel if available
-      if (channelsData.length > 0) {
-        setSelectedChannel(channelsData[0]);
+  const fetchMessages = useCallback(async (channelId = null) => {
+    try {
+      setLoading(true);
+      let messagesData;
+      if (channelId) {
+        messagesData = await getChannelMessages(channelId);
+      } else {
+        messagesData = await getMessages();
       }
-    };
+      setMessages(messagesData);
+      setError(null);
+    } catch (err) {
+      setError('Failed to fetch messages: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-    fetchData();
-  }, []); // Empty dependency array means this effect runs once on mount
+  const fetchUsers = useCallback(async () => {
+    try {
+      const usersData = await getUsers();
+      setUsers(usersData);
+    } catch (err) {
+      setError('Failed to fetch users: ' + err.message);
+    }
+  }, []);
 
-  // Return the state and setter functions
-  // This allows components using this hook to access and modify the data
-  return {
-    channels,
-    notifications,
-    directMessages,
-    selectedChannel,
-    setSelectedChannel,
-    selectedDirectMessage,
-    setSelectedDirectMessage,
+  useEffect(() => {
+    if (isAuthenticated()) {
+      fetchChannels();
+      fetchMessages();
+      fetchUsers();
+    }
+  }, [fetchChannels, fetchMessages, fetchUsers]);
+
+  useEffect(() => {
+    if (selectedChannelId) {
+      fetchMessages(selectedChannelId);
+    }
+  }, [selectedChannelId, fetchMessages]);
+
+  const selectChannel = (channelId) => {
+    setSelectedChannelId(channelId);
+  };
+
+  const sendMessage = async (channelId, content) => {
+    try {
+      const newMessage = await apiSendMessage(channelId, content);
+      setMessages(prevMessages => [...prevMessages, newMessage]);
+    } catch (err) {
+      setError('Failed to send message: ' + err.message);
+    }
+  };
+
+  return { 
+    channels, 
+    messages, 
+    users,
+    loading, 
+    error, 
+    selectChannel,
+    selectedChannelId,
+    setSelectedChannelId,
+    sendMessage,
+    fetchMessages
   };
 }
 
