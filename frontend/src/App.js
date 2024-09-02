@@ -7,7 +7,7 @@ import MessageList from './components/MessageList';
 import MessageInput from './components/MessageInput';
 import Login from './components/loginpage/Login.jsx';
 import useAppData from './hooks/useAppData';
-import { isAuthenticated, logout } from './services/auth';
+import { isAuthenticated } from './services/auth';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
@@ -89,11 +89,6 @@ function App() {
     setIsLoggedIn(true);
   };
 
-  const handleLogout = () => {
-    logout();
-    setIsLoggedIn(false);
-  };
-
   if (!isLoggedIn) {
     return <Login onLoginSuccess={handleLoginSuccess} />;
   }
@@ -111,9 +106,8 @@ function App() {
       <Sidebar
         toggleChannelList={toggleChannelList}
         toggleMessages={toggleMessages}
+        onLogout={() => setIsLoggedIn(false)}
       />
-
-      <button onClick={handleLogout}>Logout</button>
 
       {isChannelListOpen && <Channels channels={channels} handleChannelSelect={handleChannelSelect} />}
       {isMessagesOpen && <Messages messages={messages} onSelectMessage={handleMessageSelect} />}
