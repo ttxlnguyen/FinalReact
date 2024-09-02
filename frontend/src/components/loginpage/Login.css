@@ -1,3 +1,8 @@
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   background-image: url('https://static.vecteezy.com/system/resources/previews/005/549/947/original/futuristic-sci-fi-glowing-hud-user-digital-infographic-frame-abstract-hologram-hi-tech-background-virtual-reality-technology-electric-innovation-computer-network-of-data-connection-vector.jpg'); /* URL to your background image */
   background-size: cover;
@@ -44,6 +49,7 @@ body {
   margin: 5px;
   background-color: #0039d6;
   color: #fff;
+  transition: 0.3s ease;
 }
 
 .login-table button:hover {
@@ -53,6 +59,7 @@ body {
 .login-table .register-button {
   background-color: #0039d6;
   color: #fff;
+  transition: 0.3s ease;
 }
 
 .login-table .register-button:hover {
