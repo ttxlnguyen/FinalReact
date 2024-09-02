@@ -1,0 +1,47 @@
+/* Center the entire login container in the middle of the page */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+  
+.login-table {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 400px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.login-table td {
+  padding: 10px;
+}
+
+.login-table input {
+  width: 270px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.login-table button {
+  width: 100%;
+  padding: 10px;
+  background-color: #0084ff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.login-table button:hover {
+  background-color: #5900ff;
+}
+
+.error-message {
+  color: red;
+  margin-bottom: 10px;
+}
