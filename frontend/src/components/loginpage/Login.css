@@ -1,19 +1,18 @@
 body {
     background-image: url('https://static.vecteezy.com/system/resources/previews/005/549/947/original/futuristic-sci-fi-glowing-hud-user-digital-infographic-frame-abstract-hologram-hi-tech-background-virtual-reality-technology-electric-innovation-computer-network-of-data-connection-vector.jpg'); /* URL to your background image */
-    background-size: cover; /* Cover the entire viewport */
-    background-position: center; /* Center the image */
-    background-repeat: no-repeat; /* No repeating of the image */
-    margin: 0; /* Remove default margin */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin: 0;
   }
 
   .login-container {
     border-radius: 8px;
     padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional: adds shadow */
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* Full viewport height */
+    height: 100vh;
   }
   
 .login-table {
