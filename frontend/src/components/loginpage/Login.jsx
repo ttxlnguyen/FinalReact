@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLogin } from './Login';
-import './Login.css'; // Import the CSS file
+import './Login.css';
 
 function Login({ onLoginSuccess }) {
   const { username, setUsername, password, setPassword, error, handleSubmit } = useLogin(onLoginSuccess);
