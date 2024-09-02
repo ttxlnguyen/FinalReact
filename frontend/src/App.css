@@ -19,45 +19,6 @@ body {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Sidebar styles */
-.sidebar {
-  width: 80px;
-  background-color: #48cf95;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 20px;
-}
-
-.sidebar-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 30px;
-  color: #ffffff;
-  cursor: pointer;
-  opacity: 0.8;
-  transition: opacity 0.3s ease;
-}
-
-.sidebar-item:hover {
-  opacity: 1;
-}
-
-.icon {
-  font-size: 24px;
-  margin-bottom: 5px;
-}
-
-.sidebar-item span {
-  font-size: 12px;
-}
-
-.profile {
-  margin-top: auto;
-  margin-bottom: 20px;
-}
-
 /* Styles for channel list, notifications list, and messages list */
 .channel-list, .notifications-list, .messages-list {
   width: 200px;
