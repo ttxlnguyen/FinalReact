@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import Sidebar from './components/Sidebar';
+import Sidebar from './components/sidebar/Sidebar.js';
 import Channels from './Channels/Channels';
 import Messages from './Messages/Messages';
 import MessageList from './components/MessageList';

@@ -45,7 +45,10 @@ function Login({ onLoginSuccess }) {
           </tr>
           <tr>
             <td colSpan="2">
-              <button type="submit" onClick={handleSubmit}>Login</button>
+              <div className="button-container">
+                <button type="submit" onClick={handleSubmit}>Login</button>
+                <button type="button" className="register-button">Register</button>
+              </div>
             </td>
           </tr>
         </tbody>

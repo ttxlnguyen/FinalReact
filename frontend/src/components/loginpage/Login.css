@@ -1,20 +1,20 @@
 body {
-    background-image: url('https://static.vecteezy.com/system/resources/previews/005/549/947/original/futuristic-sci-fi-glowing-hud-user-digital-infographic-frame-abstract-hologram-hi-tech-background-virtual-reality-technology-electric-innovation-computer-network-of-data-connection-vector.jpg'); /* URL to your background image */
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    margin: 0;
-  }
+  background-image: url('https://static.vecteezy.com/system/resources/previews/005/549/947/original/futuristic-sci-fi-glowing-hud-user-digital-infographic-frame-abstract-hologram-hi-tech-background-virtual-reality-technology-electric-innovation-computer-network-of-data-connection-vector.jpg'); /* URL to your background image */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 0;
+}
 
-  .login-container {
-    border-radius: 8px;
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-  
+.login-container {
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
 .login-table {
   border-collapse: collapse;
   width: 100%;
@@ -31,25 +31,40 @@ body {
 .login-table input {
   width: 270px;
   padding: 8px;
-  border: 1px solid #ddd;
+  border: 1px solid #0039d6;
   border-radius: 4px;
 }
 
 .login-table button {
-  width: 100%;
+  width: 48%;
   padding: 10px;
-  background-color: #0039d6;
-  color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  margin: 5px;
+  background-color: #0039d6;
+  color: #fff;
 }
 
 .login-table button:hover {
   background-color: #6f00ff;
 }
 
+.login-table .register-button {
+  background-color: #0039d6;
+  color: #fff;
+}
+
+.login-table .register-button:hover {
+  background-color: #6f00ff;
+}
+
 .error-message {
   color: red;
   margin-bottom: 10px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
 }
