@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getChannels, getMessages, getChannelMessages, sendMessage as apiSendMessage, getUsers } from '../services/api';
+import { getChannels, getMessages, getMessagesByChannel, postMessage, getUserProfile } from '../services/api';
 import { isAuthenticated } from '../services/auth';
 
 function useAppData() {
   const [channels, setChannels] = useState([]);
   const [messages, setMessages] = useState([]);
-  const [users, setUsers] = useState([]);
   const [selectedChannelId, setSelectedChannelId] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -24,7 +24,7 @@ function useAppData() {
       setLoading(true);
       let messagesData;
       if (channelId) {
-        messagesData = await getChannelMessages(channelId);
+        messagesData = await getMessagesByChannel(channelId);
       } else {
         messagesData = await getMessages();
       }
@@ -37,12 +37,12 @@ function useAppData() {
     }
   }, []);
 
-  const fetchUsers = useCallback(async () => {
+  const fetchUserProfile = useCallback(async (userId) => {
     try {
-      const usersData = await getUsers();
-      setUsers(usersData);
+      const profileData = await getUserProfile(userId);
+      setUserProfile(profileData);
     } catch (err) {
-      setError('Failed to fetch users: ' + err.message);
+      setError('Failed to fetch user profile: ' + err.message);
     }
   }, []);
 
@@ -50,9 +50,11 @@ function useAppData() {
     if (isAuthenticated()) {
       fetchChannels();
       fetchMessages();
-      fetchUsers();
+      // Assuming you have a way to get the current user's ID
+      const currentUserId = 1; // Replace this with the actual way to get the current user's ID
+      fetchUserProfile(currentUserId);
     }
-  }, [fetchChannels, fetchMessages, fetchUsers]);
+  }, [fetchChannels, fetchMessages, fetchUserProfile]);
 
   useEffect(() => {
     if (selectedChannelId) {
@@ -64,9 +66,9 @@ function useAppData() {
     setSelectedChannelId(channelId);
   };
 
-  const sendMessage = async (channelId, content) => {
+  const sendMessage = async (content) => {
     try {
-      const newMessage = await apiSendMessage(channelId, content);
+      const newMessage = await postMessage({ content, channelId: selectedChannelId });
       setMessages(prevMessages => [...prevMessages, newMessage]);
     } catch (err) {
       setError('Failed to send message: ' + err.message);
@@ -76,7 +78,7 @@ function useAppData() {
   return { 
     channels, 
     messages, 
-    users,
+    userProfile,
     loading, 
     error, 
     selectChannel,

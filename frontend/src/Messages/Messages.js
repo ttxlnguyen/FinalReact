@@ -1,36 +1,40 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { getMessages } from '../services/api';
 
-function Messages({ messages, currentUser, onSelectUser }) {
-  // Group messages by user and get the last non-deleted message for each
-  const conversationPreviews = messages.reduce((acc, message) => {
-    if (message.deleted) return acc;
+function Messages({ onSelectMessage }) {
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    const otherUserId = message.senderId === currentUser.id ? message.receiverId : message.senderId;
-    
-    if (!acc[otherUserId] || new Date(message.sentAt) > new Date(acc[otherUserId].sentAt)) {
-      acc[otherUserId] = message;
-    }
-    
-    return acc;
-  }, {});
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const fetchedMessages = await getMessages();
+        const filteredMessages = fetchedMessages.filter(message => !message.isDeleted);
+        setMessages(filteredMessages);
+        setLoading(false);
+      } catch (err) {
+        setError('Failed to fetch messages');
+        setLoading(false);
+      }
+    };
+
+    fetchMessages();
+  }, []);
+
+  if (loading) return <div>Loading messages...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <div className="messages-list">
       <h2>Messages</h2>
       <ul>
-        {Object.entries(conversationPreviews).map(([userId, lastMessage]) => {
-          const otherUser = lastMessage.senderId === currentUser.id
-            ? { id: lastMessage.receiverId, username: lastMessage.receiverUsername }
-            : { id: lastMessage.senderId, username: lastMessage.senderUsername };
-          
-          return (
-            <li key={userId} onClick={() => onSelectUser(otherUser.id)}>
-              <strong>{otherUser.username}</strong>
-              <p>{lastMessage.content.substring(0, 50)}...</p>
-              <small>{new Date(lastMessage.sentAt).toLocaleString()}</small>
-            </li>
-          );
-        })}
+        {messages.map(message => (
+          <li key={message.id} onClick={() => onSelectMessage(message.id)}>
+            <p>{message.content.substring(0, 50)}...</p>
+            <small>Sent at: {new Date(message.sentAt).toLocaleString()}</small>
+          </li>
+        ))}
       </ul>
     </div>
   );

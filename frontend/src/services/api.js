@@ -3,81 +3,89 @@ import { getAuthToken } from './auth';
 
 const API_BASE_URL = 'http://localhost:8080/api';
 
-// Create an axios instance
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  withCredentials: true, // This is important for CORS with credentials
+  withCredentials: true,
 });
 
-// Add a request interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = getAuthToken();
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
-    console.log('Making request to:', config.url);
     return config;
   },
   (error) => {
-    console.error('Request error:', error);
     return Promise.reject(error);
   }
 );
 
-// Add a response interceptor
-axiosInstance.interceptors.response.use(
-  (response) => {
-    console.log('Received response from:', response.config.url);
-    return response;
-  },
-  (error) => {
-    if (error.response) {
-      console.error('API call error:', error.response.data);
-    } else {
-      console.error('API call error:', error.message);
-    }
-    return Promise.reject(error);
-  }
-);
-
-// Simple function to make API calls
-const apiCall = async (endpoint, method = 'GET', body = null) => {
+export const getMessages = async () => {
   try {
-    const config = {
-      method,
-      url: endpoint,
-    };
-
-    if (body) {
-      config.data = body;
-    }
-
-    const response = await axiosInstance(config);
+    const response = await axiosInstance.get('/messages');
     return response.data;
   } catch (error) {
-    console.error('API call error:', error.message);
+    console.error('Error fetching messages:', error);
     throw error;
   }
 };
 
-// API functions
-export const getAccount = () => apiCall('/account');
-export const getChannels = () => apiCall('/channels');
-export const getChannel = (id) => apiCall(`/channels/${id}`);
-export const getMessages = () => apiCall('/messages');
-export const getMessage = (id) => apiCall(`/messages/${id}`);
-export const getChannelMessages = (channelId) => apiCall(`/messages?channelId=${channelId}`);
-export const sendMessage = (channelId, content) => apiCall('/messages', 'POST', { channelId, content });
-export const getUsers = () => apiCall('/users');
+export const getMessagesByChannel = async (channelId) => {
+  try {
+    const response = await axiosInstance.get(`/messages/channels/${channelId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching messages for channel ${channelId}:`, error);
+    throw error;
+  }
+};
+
+export const postMessage = async (messageData) => {
+  try {
+    const response = await axiosInstance.post('/messages', messageData);
+    return response.data;
+  } catch (error) {
+    console.error('Error posting message:', error);
+    throw error;
+  }
+};
+
+export const getChannels = async () => {
+  try {
+    const response = await axiosInstance.get('/channels');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching channels:', error);
+    throw error;
+  }
+};
+
+export const getChannel = async (channelId) => {
+  try {
+    const response = await axiosInstance.get(`/channels/${channelId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching channel ${channelId}:`, error);
+    throw error;
+  }
+};
+
+export const getUserProfile = async (userId) => {
+  try {
+    const response = await axiosInstance.get(`/user-profiles/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    throw error;
+  }
+};
 
 export default {
-  getAccount,
+  getMessages,
+  getMessagesByChannel,
+  postMessage,
   getChannels,
   getChannel,
-  getMessages,
-  getMessage,
-  getChannelMessages,
-  sendMessage,
-  getUsers,
+  getUserProfile,
 };
