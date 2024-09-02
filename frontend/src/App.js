@@ -5,7 +5,7 @@ import Channels from './Channels/Channels';
 import Messages from './Messages/Messages';
 import MessageList from './components/MessageList';
 import MessageInput from './components/MessageInput';
-import Login from './components/Login';
+import Login from './components/loginpage/Login.jsx';
 import useAppData from './hooks/useAppData';
 import { isAuthenticated, logout } from './services/auth';
 

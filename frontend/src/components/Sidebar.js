@@ -8,22 +8,22 @@ function Sidebar({ toggleNotifications, toggleChannelList, toggleMessages }) {
     <div className="sidebar">
       {/* Notifications icon */}
       <div className="sidebar-item" onClick={toggleNotifications}>
-        <i className="icon">🔔</i>
+        <div className="icon">🔔</div>
         <span>Notifications</span>
       </div>
       {/* Channels icon */}
       <div className="sidebar-item" onClick={toggleChannelList}>
-        <i className="icon">🏠</i>
+        <div className="icon">🏠</div>
         <span>Channels</span>
       </div>
       {/* Messages icon */}
       <div className="sidebar-item" onClick={toggleMessages}>
-        <i className="icon">💬</i>
+        <div className="icon">💬</div>
         <span>Messages</span>
       </div>
       {/* Profile icon */}
       <div className="sidebar-item profile">
-        <i className="icon">👤</i>
+        <div className="icon">👤</div>
         <span>Profile</span>
       </div>
     </div>
