@@ -1,17 +1,26 @@
-/* Center the entire login container in the middle of the page */
-.login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
+body {
+    background-image: url('https://static.vecteezy.com/system/resources/previews/005/549/947/original/futuristic-sci-fi-glowing-hud-user-digital-infographic-frame-abstract-hologram-hi-tech-background-virtual-reality-technology-electric-innovation-computer-network-of-data-connection-vector.jpg'); /* URL to your background image */
+    background-size: cover; /* Cover the entire viewport */
+    background-position: center; /* Center the image */
+    background-repeat: no-repeat; /* No repeating of the image */
+    margin: 0; /* Remove default margin */
+  }
+
+  .login-container {
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional: adds shadow */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height */
+  }
   
 .login-table {
   border-collapse: collapse;
   width: 100%;
   max-width: 400px;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
+  background-color: #ffffffcc;
   border-radius: 8px;
   padding: 20px;
 }
@@ -30,7 +39,7 @@
 .login-table button {
   width: 100%;
   padding: 10px;
-  background-color: #0084ff;
+  background-color: #0039d6;
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -38,7 +47,7 @@
 }
 
 .login-table button:hover {
-  background-color: #5900ff;
+  background-color: #6f00ff;
 }
 
 .error-message {
