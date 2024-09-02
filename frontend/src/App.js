@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import Sidebar from './components/sidebar/Sidebar.js';
-import Channels from './Channels/Channels';
+import Channels from './components/channels/Channels.js';
 import Messages from './Messages/Messages';
 import MessageList from './components/MessageList';
 import MessageInput from './components/MessageInput';

@@ -1,8 +1,5 @@
-// Sidebar.js
-
 import React from 'react';
 import './Sidebar.css';
-import { logout } from '../../services/auth';
 
 // Sidebar component
 // This component renders the sidebar with navigation icons

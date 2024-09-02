@@ -27,10 +27,6 @@
   margin-bottom: 5px;
 }
 
-.sidebar-item-span {
-  font-size: 12px;
-}
-
 .sidebar-item-profile {
   display: flex;
   flex-direction: column;
