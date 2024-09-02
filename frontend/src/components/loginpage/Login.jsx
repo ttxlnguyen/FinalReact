@@ -1,41 +1,22 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useLogin } from './Login';
-import { register } from '../../services/auth';
 import './Login.css';
 
 function Login({ onLoginSuccess }) {
-  const { username, setUsername, password, setPassword, error, handleSubmit } = useLogin(onLoginSuccess);
-  const [email, setEmail] = useState('');
-  const [isRegistering, setIsRegistering] = useState(false);
-  const [registrationError, setRegistrationError] = useState('');
+  const {
+    formData,
+    setFormData,
+    error,
+    isRegistering,
+    registrationError,
+    handleSubmit,
+    handleRegister,
+    toggleRegistration
+  } = useLogin(onLoginSuccess);
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    console.log('Attempting registration...');
-    try {
-      await register(username, email, password);
-      console.log('Registration successful');
-      setIsRegistering(false);
-      setRegistrationError('');
-      alert('Registration successful! Please log in with your new credentials.');
-    } catch (error) {
-      console.error('Registration failed:', error);
-      const errorMessage = error.response && error.response.data && error.response.data.message
-        ? error.response.data.message
-        : 'Registration failed. Please try again.';
-      setRegistrationError(errorMessage);
-    }
-  };
-
-  const wrappedHandleSubmit = async (e) => {
-    e.preventDefault();
-    console.log('Attempting login...');
-    try {
-      await handleSubmit(e);
-      console.log('Login successful');
-    } catch (error) {
-      console.error('Login failed:', error);
-    }
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevData => ({ ...prevData, [name]: value }));
   };
 
   return (
@@ -57,8 +38,9 @@ function Login({ onLoginSuccess }) {
               <input
                 type="text"
                 id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                name="username"
+                value={formData.username}
+                onChange={handleInputChange}
                 required
               />
             </td>
@@ -72,8 +54,9 @@ function Login({ onLoginSuccess }) {
                 <input
                   type="email"
                   id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
                   required
                 />
               </td>
@@ -87,8 +70,9 @@ function Login({ onLoginSuccess }) {
               <input
                 type="password"
                 id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
                 required
               />
             </td>
@@ -99,18 +83,12 @@ function Login({ onLoginSuccess }) {
                 {isRegistering ? (
                   <>
                     <button type="submit" onClick={handleRegister}>Register</button>
-                    <button type="button" onClick={() => {
-                      setIsRegistering(false);
-                      setRegistrationError('');
-                    }}>Back to Login</button>
+                    <button type="button" onClick={toggleRegistration}>Back to Login</button>
                   </>
                 ) : (
                   <>
-                    <button type="submit" onClick={wrappedHandleSubmit}>Login</button>
-                    <button type="button" onClick={() => {
-                      setIsRegistering(true);
-                      setRegistrationError('');
-                    }}>Register</button>
+                    <button type="submit" onClick={handleSubmit}>Login</button>
+                    <button type="button" onClick={toggleRegistration}>Register</button>
                   </>
                 )}
               </div>

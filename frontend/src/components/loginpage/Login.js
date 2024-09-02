@@ -1,28 +1,58 @@
 import { useState } from 'react';
-import { login } from '../../services/auth';
+import { login, register } from '../../services/auth';
 
 export function useLogin(onLoginSuccess) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: ''
+  });
   const [error, setError] = useState('');
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [registrationError, setRegistrationError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     try {
-      await login(username, password);
+      await login(formData.username, formData.password);
       onLoginSuccess();
     } catch (err) {
       setError('Login failed. Please check your credentials.');
     }
   };
 
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setRegistrationError('');
+    try {
+      await register(formData.username, formData.email, formData.password);
+      setIsRegistering(false);
+      setFormData(prevData => ({ ...prevData, email: '' }));
+      alert('Registration successful! Please log in with your new credentials.');
+    } catch (error) {
+      const errorMessage = error.response && error.response.data && error.response.data.message
+        ? error.response.data.message
+        : 'Registration failed. Please try again.';
+      setRegistrationError(errorMessage);
+    }
+  };
+
+  const toggleRegistration = () => {
+    setIsRegistering(!isRegistering);
+    setError('');
+    setRegistrationError('');
+  };
+
   return {
-    username,
-    setUsername,
-    password,
-    setPassword,
+    formData,
+    setFormData,
     error,
-    handleSubmit
+    handleSubmit,
+    isRegistering,
+    setIsRegistering,
+    registrationError,
+    handleRegister,
+    toggleRegistration
   };
 }
