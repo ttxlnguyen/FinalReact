@@ -4,7 +4,7 @@ import Sidebar from './components/sidebar/Sidebar.js';
 import Channels from './components/channels/Channels.js';
 import Messages from './Messages/Messages';
 import MessageList from './components/MessageList';
-import MessageInput from './components/MessageInput';
+import MessageInput from './components/typingbar/Typingbar.js';
 import Login from './components/loginpage/Login.jsx';
 import useAppData from './hooks/useAppData';
 import { isAuthenticated } from './services/auth';
