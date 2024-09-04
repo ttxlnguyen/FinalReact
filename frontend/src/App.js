@@ -4,7 +4,7 @@ import Sidebar from './components/sidebar/Sidebar.js';
 import Channels from './components/channels/Channels.js';
 import Messages from './components/messages/Messages.js';
 import MessageList from './components/MessageList';
-import MessageInput from './components/typingbar/Typingbar.js';
+import Typingbar from './components/typingbar/Typingbar.js';
 import Login from './components/loginpage/Login.jsx';
 import useAppData from './hooks/useAppData';
 import { isAuthenticated } from './services/auth';
@@ -126,8 +126,7 @@ function App() {
           messages={messages}
           selectedMessageId={selectedMessageId}
         />
-        
-        <MessageInput
+        <Typingbar
           inputMessage={inputMessage}
           handleInputChange={handleInputChange}
           handleMessageSubmit={handleMessageSubmit}

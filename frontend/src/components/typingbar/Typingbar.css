@@ -1,21 +1,21 @@
-.message-input {
+.typing-bar {
   display: flex;
-  padding: 20px;
-  border-top: 1px solid #e0e0e0;
+  padding: 10px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.message-input input {
+.typing-bar input {
   flex-grow: 1;
-  padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 14px;
 }
 
-.message-input button {
+.typing-bar button {
   padding: 10px 20px;
   background-color: #0039d6;
-  color: white;
+  color: #ffffff;
   border: none;
   border-radius: 4px;
   margin-left: 10px;
@@ -23,6 +23,6 @@
   transition: background-color 0.3s ease;
 }
 
-.message-input button:hover {
+.typing-bar button:hover {
   background-color: #6f00ff;
 }
