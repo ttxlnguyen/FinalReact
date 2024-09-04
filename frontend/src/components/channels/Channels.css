@@ -1,34 +1,52 @@
 /* Styles for channel list, notifications list, and messages list */
 .channel-list, .notifications-list, .messages-list {
-    width: 200px;
-    background-color: #040536a4;
-    color: #ffffff;
-    padding: 20px;
-    overflow-y: auto;
-  }
-  
-  .channel-list h2, .notifications-list h2, .messages-list h2 {
-    font-size: 16px;
-    margin-top: 0;
-    margin-bottom: 15px;
-  }
-  
-  .channel-list ul, .notifications-list ul, .messages-list ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .channel-list li, .notifications-list li, .messages-list li {
-    padding: 8px 0;
-    cursor: pointer;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  .channel-list li:hover, .notifications-list li:hover, .messages-list li:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-  
-  .notifications-list li, .messages-list li {
-    font-size: 14px;
-  }
+  width: 200px;
+  background-color: #040536a4;
+  color: #ffffff;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.channel-list h2, .notifications-list h2, .messages-list h2 {
+  font-size: 16px;
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.channel-list ul, .notifications-list ul, .messages-list ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.channel-list li, .notifications-list li, .messages-list li {
+  padding: 8px 0;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.channel-list li:hover, .notifications-list li:hover, .messages-list li:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.notifications-list li, .messages-list li {
+  font-size: 14px;
+}
+
+.add-channel-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 110px;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.add-channel-btn:hover {
+  opacity: 1;
+}
+
+.add-channel-btn svg {
+  vertical-align: middle;
+}
