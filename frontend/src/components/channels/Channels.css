@@ -17,6 +17,7 @@
   list-style-type: none;
   padding: 0;
   margin: 0;
+  font-size: 14px;
 }
 
 .channel-list li, .notifications-list li {
