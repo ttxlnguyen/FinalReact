@@ -3,9 +3,9 @@ import './Typingbar.css';
 
 // MessageInput component
 // This component renders the input field for typing messages and the send button
-function MessageInput({ inputMessage, handleInputChange, handleMessageSubmit }) {
+function Typingbar({ inputMessage, handleInputChange, handleMessageSubmit }) {
   return (
-    <form onSubmit={handleMessageSubmit} className="message-input">
+    <form onSubmit={handleMessageSubmit} className="typing-bar">
       <input
         type="text"
         value={inputMessage}
@@ -17,7 +17,7 @@ function MessageInput({ inputMessage, handleInputChange, handleMessageSubmit }) 
   );
 }
 
-export default MessageInput;
+export default Typingbar;
 
 // Note: This component doesn't require any backend .jsx file as it's purely a frontend component.
 // It receives the necessary props from its parent component (App.js) to handle the input state and submission.
