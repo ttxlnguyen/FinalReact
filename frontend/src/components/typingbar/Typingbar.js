@@ -1,4 +1,5 @@
 import React from 'react';
+import './Typingbar.css';
 
 // MessageInput component
 // This component renders the input field for typing messages and the send button
