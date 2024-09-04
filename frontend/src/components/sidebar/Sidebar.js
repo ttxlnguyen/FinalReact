@@ -1,11 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './Sidebar.css';
+import UserProfile from '../userprofile/UserProfile';
 
 // Sidebar component
 // This component renders the sidebar with navigation icons
 // It receives toggle functions as props to control the visibility of different sections
 // It also receives onLogout function to handle user logout
-function Sidebar({ toggleNotifications, toggleChannelList, toggleMessages, onLogout }) {
+function Sidebar({ toggleNotifications, toggleChannelList, toggleMessages, onLogout, user }) {
+  const [showProfile, setShowProfile] = useState(false);
+
+  const handleProfileClick = () => {
+    setShowProfile(true);
+  };
+
+  const handleCloseProfile = () => {
+    setShowProfile(false);
+  };
+  
   return (
     <div className="sidebar">
       {/* Notifications icon */}
@@ -32,7 +43,7 @@ function Sidebar({ toggleNotifications, toggleChannelList, toggleMessages, onLog
         <span>Messages</span>
       </div>
       {/* Profile icon */}
-      <div className="sidebar-item-profile">
+      <div className="sidebar-item-profile" onClick={handleProfileClick}>
         <svg xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 20 20" height="40px" viewBox="0 0 20 20" width="40px" fill="#e8eaed"><g><rect fill="none" height="20" width="20"/></g><g><g>
           <path d="M10 2c-4.42 0-8 3.58-8 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 3.5c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 11c-2.05 0-3.87-.95-5.07-2.44 1.45-.98 3.19-1.56 5.07-1.56s3.62.58 5.07 1.56c-1.2 1.49-3.02 2.44-5.07 2.44z"/></g></g>
         </svg>
@@ -45,6 +56,8 @@ function Sidebar({ toggleNotifications, toggleChannelList, toggleMessages, onLog
         </svg>
         <span>Logout</span>
       </div>
+      {/* Render the UserProfile component if showProfile is true */}
+      {showProfile && <UserProfile user={user} onClose={handleCloseProfile} />}
     </div>
   );
 }
