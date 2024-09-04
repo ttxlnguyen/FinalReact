@@ -14,7 +14,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
-  background-color: #f8f8f8;
+  background-color: #000000;
 }
 
 /* Main app container */
@@ -45,7 +45,7 @@ body {
 .main-header h1 {
   font-size: 18px;
   margin: 0 0 5px 0;
-  color:#f1f1f1;
+  color:#d1d1d1;
 }
 
 .main-header p {
@@ -61,17 +61,17 @@ body {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  color: #f1f1f1;
+  color: #d1d1d1;
 }
 
 .message-conversation {
-  color: #f1f1f1;
+  color: #d1d1d1;
 }
 
 .message {
   margin-bottom: 15px;
   padding: 10px;
-  background-color: #f1f1f1;
+  background-color: #d1d1d1;
   border-radius: 5px;
   max-width: 80%;
 }
@@ -83,6 +83,6 @@ body {
 
 .message .timestamp {
   font-size: 12px;
-  color: #888;
+  color: #d1d1d1;
   margin-left: 10px;
 }

@@ -3,19 +3,19 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: white;
-  border: 1px solid #ddd;
+  background: #7b46ff90;
+  border: 1px solid #d1d1d1;
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 10px #00000033;
   padding: 20px;
   width: 300px;
-  z-index: 1000;
 }
 
 .user-profile-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: #d1d1d1;
 }
 
 .user-profile-close-button {
@@ -26,7 +26,7 @@
 }
 
 .user-profile-info {
-  margin-top: 10px;
+  color: #d1d1d1;
 }
 
 .user-profile-info p {
