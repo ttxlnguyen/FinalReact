@@ -2,66 +2,24 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:8080/api';
 
-const getToken = () => localStorage.getItem('jhi-authenticationToken');
-
-export const getUserProfileById = async (username) => {
-  try {
-    const response = await axios.get(`${API_BASE_URL}/user-profiles/username/${username}`, {
-      headers: {
-        'Authorization': `Bearer ${getToken()}`,
-        'Accept': '*/*'
-      }
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching user profile:', error.response ? error.response.data : error.message);
-    throw error;
-  }
-};
-
-export const isAuthenticated = () => {
-  const token = getToken();
-  return !!token;
-};
-
-// Function to log in a user
 export const login = async (username, password) => {
   try {
-    // Fetch user profile and authenticate in one step
-    const response = await axios.get(`${API_BASE_URL}/user-profiles/username/${username}`, {
-      auth: {
-        username: username,
-        password: password
-      }
-    });
-
-    const userProfileData = response.data;
-
-    // Use the id from the user profile as the token
-    const token = userProfileData.id.toString();
-
-    // Store the token and user profile data
+    console.log('Attempting login with:', { username, password });
+    const response = await axios.post(`${API_BASE_URL}/authenticate`, { username, password, rememberMe: true });
+    console.log('Login response:', response.data);
+    const token = response.data.id_token;
     localStorage.setItem('jhi-authenticationToken', token);
-    localStorage.setItem('userProfile', JSON.stringify(userProfileData));
-
-    return { token, userProfile: userProfileData };
+    return token;
   } catch (error) {
     console.error('Login failed:', error.response ? error.response.data : error.message);
+    console.error('Full error object:', error);
     throw error;
   }
 };
 
-// Function to register a new user
 export const register = async (username, email, password) => {
   try {
-    if (!username || !email || !password) {
-      throw new Error("Missing required fields: username, email, or password");
-    }
-
-    const payload = { username, email, password };
-    console.log("Register payload:", payload); // For debugging purposes
-
-    const response = await axios.post(`${API_BASE_URL}/register`, payload);
+    const response = await axios.post(`${API_BASE_URL}/register`, { login: username, email, password });
     return response.data;
   } catch (error) {
     console.error('Registration failed:', error.response ? error.response.data : error.message);
@@ -69,20 +27,46 @@ export const register = async (username, email, password) => {
   }
 };
 
-// Function to retrieve the auth token
+export const logout = () => {
+  localStorage.removeItem('jhi-authenticationToken');
+};
+
+export const isAuthenticated = () => {
+  return !!localStorage.getItem('jhi-authenticationToken');
+};
+
 export const getAuthToken = () => {
   return localStorage.getItem('jhi-authenticationToken');
 };
 
-// Function to retrieve the user profile
-export const getUserProfile = () => {
-  const userProfileString = localStorage.getItem('userProfile');
-  return userProfileString ? JSON.parse(userProfileString) : null;
+export const getCurrentUser = async () => {
+  try {
+    const token = getAuthToken();
+    if (!token) {
+      return null;
+    }
+    const response = await axios.get(`${API_BASE_URL}/account`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching current user:', error);
+    return null;
+  }
 };
 
-// Function to log out a user
-export const logout = () => {
-  localStorage.removeItem('jhi-authenticationToken');
-  localStorage.removeItem('userProfile');
+export const checkAuthStatus = async () => {
+  const token = getAuthToken();
+  const currentUser = await getCurrentUser();
+  console.log('Auth Token:', token);
+  console.log('Current User:', currentUser);
+  return { isAuthenticated: !!token, currentUser };
 };
 
+/**
+ * Changes made for debugging:
+ * 1. Added more detailed logging in the login function to see the exact request payload and response.
+ * 2. Included full error object logging for more comprehensive error information.
+ */

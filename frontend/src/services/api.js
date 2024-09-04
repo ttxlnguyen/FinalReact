@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getAuthToken } from './auth';
+import { getAuthToken, getCurrentUser } from './auth';
 
 const API_BASE_URL = 'http://localhost:8080/api';
 
@@ -21,13 +21,22 @@ axiosInstance.interceptors.request.use(
   }
 );
 
+const handleApiError = (error, errorMessage) => {
+  console.error(errorMessage, error);
+  if (error.response) {
+    console.error('Response data:', error.response.data);
+    console.error('Response status:', error.response.status);
+    console.error('Response headers:', error.response.headers);
+  }
+  throw error;
+};
+
 export const getMessages = async () => {
   try {
     const response = await axiosInstance.get('/messages');
     return response.data;
   } catch (error) {
-    console.error('Error fetching messages:', error);
-    throw error;
+    handleApiError(error, 'Error fetching messages:');
   }
 };
 
@@ -36,8 +45,7 @@ export const getMessagesByChannel = async (channelId) => {
     const response = await axiosInstance.get(`/messages/channels/${channelId}`);
     return response.data;
   } catch (error) {
-    console.error(`Error fetching messages for channel ${channelId}:`, error);
-    throw error;
+    handleApiError(error, `Error fetching messages for channel ${channelId}:`);
   }
 };
 
@@ -46,8 +54,7 @@ export const postMessage = async (messageData) => {
     const response = await axiosInstance.post('/messages', messageData);
     return response.data;
   } catch (error) {
-    console.error('Error posting message:', error);
-    throw error;
+    handleApiError(error, 'Error posting message:');
   }
 };
 
@@ -56,8 +63,7 @@ export const getChannels = async () => {
     const response = await axiosInstance.get('/channels');
     return response.data;
   } catch (error) {
-    console.error('Error fetching channels:', error);
-    throw error;
+    handleApiError(error, 'Error fetching channels:');
   }
 };
 
@@ -66,18 +72,21 @@ export const getChannel = async (channelId) => {
     const response = await axiosInstance.get(`/channels/${channelId}`);
     return response.data;
   } catch (error) {
-    console.error(`Error fetching channel ${channelId}:`, error);
-    throw error;
+    handleApiError(error, `Error fetching channel ${channelId}:`);
   }
 };
 
-export const getUserProfile = async (userId) => {
+export const getUserProfile = async () => {
   try {
-    const response = await axiosInstance.get(`/user-profiles/${userId}`);
+    const currentUser = getCurrentUser();
+    if (!currentUser || !currentUser.username) {
+      console.log('No current user found, skipping profile fetch');
+      return null;
+    }
+    const response = await axiosInstance.get(`/user-profiles/username/${currentUser.username}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching user profile:', error);
-    throw error;
+    handleApiError(error, 'Error fetching user profile:');
   }
 };
 
@@ -90,3 +99,9 @@ export default {
   getUserProfile,
 };
 
+/**
+ * Changes made to address authentication issues:
+ * 1. Kept the axios interceptor using Bearer token authentication.
+ * 2. Ensured all API calls use the axiosInstance with the correct headers.
+ * 3. Kept improved error handling and logging for API requests.
+ */

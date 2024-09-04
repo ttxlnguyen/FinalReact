@@ -1,25 +1,30 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getChannels, getMessages, getMessagesByChannel, postMessage, getUserProfile } from '../services/api';
-import { isAuthenticated } from '../services/auth';
+import { getCurrentUser } from '../services/auth';
 
-function useAppData() {
+function useAppData(isLoggedIn) {
   const [channels, setChannels] = useState([]);
   const [messages, setMessages] = useState([]);
   const [selectedChannelId, setSelectedChannelId] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const fetchChannels = useCallback(async () => {
+    if (!isLoggedIn) return;
     try {
+      setLoading(true);
       const channelsData = await getChannels();
       setChannels(channelsData);
     } catch (err) {
       setError('Failed to fetch channels: ' + err.message);
+    } finally {
+      setLoading(false);
     }
-  }, []);
+  }, [isLoggedIn]);
 
   const fetchMessages = useCallback(async (channelId = null) => {
+    if (!isLoggedIn) return;
     try {
       setLoading(true);
       let messagesData;
@@ -35,38 +40,38 @@ function useAppData() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isLoggedIn]);
 
-  const fetchUserProfile = useCallback(async (userId) => {
+  const fetchUserProfile = useCallback(async () => {
+    if (!isLoggedIn) return;
     try {
-      const profileData = await getUserProfile(userId);
+      const profileData = await getUserProfile();
       setUserProfile(profileData);
     } catch (err) {
       setError('Failed to fetch user profile: ' + err.message);
     }
-  }, []);
+  }, [isLoggedIn]);
 
   useEffect(() => {
-    if (isAuthenticated()) {
+    if (isLoggedIn) {
       fetchChannels();
       fetchMessages();
-      // Assuming you have a way to get the current user's ID
-      const currentUserId = 1; // Replace this with the actual way to get the current user's ID
-      fetchUserProfile(currentUserId);
+      fetchUserProfile();
     }
-  }, [fetchChannels, fetchMessages, fetchUserProfile]);
+  }, [isLoggedIn, fetchChannels, fetchMessages, fetchUserProfile]);
 
   useEffect(() => {
-    if (selectedChannelId) {
+    if (isLoggedIn && selectedChannelId) {
       fetchMessages(selectedChannelId);
     }
-  }, [selectedChannelId, fetchMessages]);
+  }, [isLoggedIn, selectedChannelId, fetchMessages]);
 
   const selectChannel = (channelId) => {
     setSelectedChannelId(channelId);
   };
 
   const sendMessage = async (content) => {
+    if (!isLoggedIn) return;
     try {
       const newMessage = await postMessage({ content, channelId: selectedChannelId });
       setMessages(prevMessages => [...prevMessages, newMessage]);
@@ -90,3 +95,12 @@ function useAppData() {
 }
 
 export default useAppData;
+
+/**
+ * Changes made to address authentication issues:
+ * 1. Added isLoggedIn as a parameter to useAppData.
+ * 2. Added isLoggedIn checks before performing any API calls.
+ * 3. Removed the isAuthenticated import and rely on the isLoggedIn prop.
+ * 4. Updated the fetchUserProfile function to use the getUserProfile from api.js.
+ * 5. Set initial loading state to false to prevent unnecessary loading indicators.
+ */

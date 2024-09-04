@@ -1,83 +1,71 @@
 import { useState } from 'react';
-import { login, register } from '../../services/auth';
+import { login, register, checkAuthStatus } from '../../services/auth';
 
 export function useLogin(onLoginSuccess) {
- const [formData, setFormData] = useState({
-   username: '',
-   email: '',
-   password: ''
- });
- const [error, setError] = useState('');
- const [isRegistering, setIsRegistering] = useState(false);
- const [registrationError, setRegistrationError] = useState('');
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: ''
+  });
+  const [error, setError] = useState('');
+  const [isRegistering, setIsRegistering] = useState(false);
 
- const handleChange = (e) => {
-   const { name, value } = e.target;
-   setFormData({ ...formData, [name]: value });
- };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
- const handleSubmit = async (e) => {
-   e.preventDefault();
-   setError('');
-   try {
-     // The login function now returns both token and userProfile
-     const { token, userProfile } = await login(formData.username, formData.password);
-     
-     // You can use the userProfile data here if needed
-     console.log('User profile:', userProfile);
-     
-     // Call onLoginSuccess with the user profile data
-     onLoginSuccess(userProfile);
-   } catch (err) {
-     setError('Login failed. Please check your credentials.');
-   }
- };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    try {
+      if (isRegistering) {
+        await register(formData.username, formData.email, formData.password);
+        alert('Registration successful! Please log in with your new credentials.');
+        setIsRegistering(false);
+      } else {
+        console.log('Attempting login with:', formData);
+        const token = await login(formData.username, formData.password);
+        console.log('Login successful, token:', token);
+        const authStatus = await checkAuthStatus();
+        console.log('Auth status after login:', authStatus);
+        onLoginSuccess(token);
+      }
+    } catch (err) {
+      setError(isRegistering ? 'Registration failed. Please try again.' : 'Login failed. Please check your credentials.');
+      console.error('Login/Register error:', err);
+      if (err.response) {
+        console.error('Error response:', err.response.data);
+        console.error('Error status:', err.response.status);
+        console.error('Error headers:', err.response.headers);
+      } else if (err.request) {
+        console.error('Error request:', err.request);
+      } else {
+        console.error('Error message:', err.message);
+      }
+    }
+  };
 
- const handleRegister = async (e) => {
-   e.preventDefault();
-   setRegistrationError('');
-   try {
-     await register(formData.username, formData.email, formData.password);
-     setIsRegistering(false);
-     setFormData(prevData => ({ ...prevData, email: '' }));
-     alert('Registration successful! Please log in with your new credentials.');
-   } catch (error) {
-     const errorMessage = error.response && error.response.data && error.response.data.detail
-       ? error.response.data.detail
-       : 'Registration failed. Please try again.';
-     setRegistrationError(errorMessage);
-   }
- };
+  const toggleRegistration = () => {
+    setIsRegistering(!isRegistering);
+    setError('');
+  };
 
- const toggleRegistration = () => {
-   setIsRegistering(!isRegistering);
-   setError('');
-   setRegistrationError('');
- };
-
- return {
-   formData,
-   setFormData,
-   error,
-   handleSubmit,
-   handleChange,
-   isRegistering,
-   setIsRegistering,
-   registrationError,
-   handleRegister,
-   toggleRegistration
- };
+  return {
+    formData,
+    setFormData,
+    error,
+    handleSubmit,
+    handleChange,
+    isRegistering,
+    setIsRegistering,
+    toggleRegistration
+  };
 }
 
-// Add comments to explain the changes
 /**
- * Changes made to address the user profile login issue:
- * 1. Updated the handleSubmit function to destructure the return value of the login function,
- *    which now includes both the token and the userProfile.
- * 2. Added a console.log to demonstrate how to access the userProfile data after login.
- * 3. Modified the onLoginSuccess call to include the userProfile data, allowing the parent
- *    component to access and use this information as needed.
- * 
- * These changes ensure that the user profile data is properly fetched and made available
- * upon successful login, addressing the issue of not being able to use user-profile data for login.
+ * Changes made for debugging:
+ * 1. Added more detailed logging in the handleSubmit function to see the exact form data being submitted.
+ * 2. Included more comprehensive error logging to capture different types of errors.
+ * 3. Kept the async nature of checkAuthStatus call.
  */
