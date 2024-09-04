@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import Sidebar from './components/sidebar/Sidebar.js';
 import Channels from './components/channels/Channels.js';
-import Messages from './Messages/Messages';
+import Messages from './components/messages/Messages.js';
 import MessageList from './components/MessageList';
 import MessageInput from './components/typingbar/Typingbar.js';
 import Login from './components/loginpage/Login.jsx';
