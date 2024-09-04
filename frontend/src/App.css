@@ -21,30 +21,31 @@ body {
 .App {
   display: flex;
   height: calc(100vh - 40px);
-  max-width: 1400px;
+  max-width: 95%;
   margin: 20px auto;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px #0000001a;
 }
 
 /* Main content area styles */
 .main-content {
   flex-grow: 1;
-  background-color: #ffffff;
+  background-color: #060745bc;
   display: flex;
   flex-direction: column;
 }
 
 .main-header {
   padding: 20px;
-  border-bottom: 1px solid #e0e0e0;
-  background-color: #f8f8f8;
+  border-bottom: 1px solid #0c0fbb;
+  background-color: #080967bc;
 }
 
 .main-header h1 {
   font-size: 18px;
   margin: 0 0 5px 0;
+  color:#f1f1f1;
 }
 
 .main-header p {
@@ -60,6 +61,11 @@ body {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  color: #f1f1f1;
+}
+
+.message-conversation {
+  color: #f1f1f1;
 }
 
 .message {
