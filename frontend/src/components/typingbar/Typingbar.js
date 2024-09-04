@@ -1,23 +1,22 @@
 import React from 'react';
 import './Typingbar.css';
 
-// MessageInput component
+// Typingbar component
 // This component renders the input field for typing messages and the send button
 function Typingbar({ inputMessage, handleInputChange, handleMessageSubmit }) {
   return (
-    <form onSubmit={handleMessageSubmit} className="typing-bar">
-      <input
-        type="text"
-        value={inputMessage}
-        onChange={handleInputChange}
-        placeholder="Type your message here..."
-      />
-      <button type="submit">Send</button>
-    </form>
+    <div className='typing-bar'>
+      <form onSubmit={handleMessageSubmit} className="typing-bar">
+        <input
+          type="text"
+          value={inputMessage}
+          onChange={handleInputChange}
+          placeholder="Type your message here..."
+        />
+        <button type="submit">Send</button>
+      </form>
+    </div>
   );
 }
 
 export default Typingbar;
-
-// Note: This component doesn't require any backend .jsx file as it's purely a frontend component.
-// It receives the necessary props from its parent component (App.js) to handle the input state and submission.

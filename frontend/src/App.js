@@ -126,13 +126,11 @@ function App() {
           messages={messages}
           selectedMessageId={selectedMessageId}
         />
-        <div className=''>
-          <Typingbar
-            inputMessage={inputMessage}
-            handleInputChange={handleInputChange}
-            handleMessageSubmit={handleMessageSubmit}
-          />
-        </div>
+        <Typingbar
+          inputMessage={inputMessage}
+          handleInputChange={handleInputChange}
+          handleMessageSubmit={handleMessageSubmit}
+        />
       </div>
     </div>
   );
