@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { getMessages } from '../services/api';
+import { getMessages } from '../../services/api';
+import './Messages.css'
 
 function Messages({ onSelectMessage }) {
   const [messages, setMessages] = useState([]);
