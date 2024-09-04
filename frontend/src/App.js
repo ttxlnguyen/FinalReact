@@ -85,6 +85,13 @@ function App() {
     }
   };
 
+  // Tempt sudo profile to until we can fetch from backend
+  const user = {
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+    password: '******'
+  };
+
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
   };
@@ -107,6 +114,7 @@ function App() {
         toggleChannelList={toggleChannelList}
         toggleMessages={toggleMessages}
         onLogout={() => setIsLoggedIn(false)}
+        user={user}
       />
 
       {isChannelListOpen && <Channels channels={channels} handleChannelSelect={handleChannelSelect} />}
