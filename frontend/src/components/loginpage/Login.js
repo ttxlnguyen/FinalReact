@@ -8,6 +8,7 @@ export function useLogin(onLoginSuccess) {
     password: ''
   });
   const [error, setError] = useState('');
+  const [registrationError, setRegistrationError] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
 
   const handleChange = (e) => {
@@ -19,43 +20,61 @@ export function useLogin(onLoginSuccess) {
     e.preventDefault();
     setError('');
     try {
-      if (isRegistering) {
-        await register(formData.username, formData.email, formData.password);
-        alert('Registration successful! Please log in with your new credentials.');
-        setIsRegistering(false);
-      } else {
-        console.log('Attempting login with:', formData);
-        const token = await login(formData.username, formData.password);
-        console.log('Login successful, token:', token);
-        const authStatus = await checkAuthStatus();
-        console.log('Auth status after login:', authStatus);
-        onLoginSuccess(token);
-      }
+      console.log('Attempting login with:', formData);
+      const result = await login(formData.username, formData.password);
+      console.log('Login successful, user profile:', result.userProfile);
+      const authStatus = await checkAuthStatus();
+      console.log('Auth status after login:', authStatus);
+      onLoginSuccess(result.token);
     } catch (err) {
-      setError(isRegistering ? 'Registration failed. Please try again.' : 'Login failed. Please check your credentials.');
-      console.error('Login/Register error:', err);
-      if (err.response) {
-        console.error('Error response:', err.response.data);
-        console.error('Error status:', err.response.status);
-        console.error('Error headers:', err.response.headers);
-      } else if (err.request) {
-        console.error('Error request:', err.request);
-      } else {
-        console.error('Error message:', err.message);
-      }
+      setError('Login failed. Please check your credentials.');
+      console.error('Login error:', err);
+      logError(err);
+    }
+  };
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setRegistrationError('');
+    try {
+      console.log('Attempting registration with:', formData);
+      const result = await register(formData.username, formData.email, formData.password);
+      console.log('Registration successful, user profile:', result.userProfile);
+      const authStatus = await checkAuthStatus();
+      console.log('Auth status after registration:', authStatus);
+      onLoginSuccess(result.token);
+    } catch (err) {
+      setRegistrationError('Registration failed. Please try again.');
+      console.error('Registration error:', err);
+      logError(err);
     }
   };
 
   const toggleRegistration = () => {
     setIsRegistering(!isRegistering);
     setError('');
+    setRegistrationError('');
+  };
+
+  const logError = (err) => {
+    if (err.response) {
+      console.error('Error response:', err.response.data);
+      console.error('Error status:', err.response.status);
+      console.error('Error headers:', err.response.headers);
+    } else if (err.request) {
+      console.error('Error request:', err.request);
+    } else {
+      console.error('Error message:', err.message);
+    }
   };
 
   return {
     formData,
     setFormData,
     error,
+    registrationError,
     handleSubmit,
+    handleRegister,
     handleChange,
     isRegistering,
     setIsRegistering,
@@ -64,8 +83,9 @@ export function useLogin(onLoginSuccess) {
 }
 
 /**
- * Changes made for debugging:
- * 1. Added more detailed logging in the handleSubmit function to see the exact form data being submitted.
- * 2. Included more comprehensive error logging to capture different types of errors.
- * 3. Kept the async nature of checkAuthStatus call.
+ * Changes made to fix registration:
+ * 1. Added a separate handleRegister function for registration.
+ * 2. Added registrationError state to handle registration-specific errors.
+ * 3. Updated error handling to set appropriate error messages for login and registration.
+ * 4. Kept detailed logging for debugging purposes.
  */
