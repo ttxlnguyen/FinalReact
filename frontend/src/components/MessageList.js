@@ -20,10 +20,31 @@ function MessageList({ messages, selectedMessageId }) {
 
     return (
       <div className="message-conversation">
-        <h2>Conversation</h2>
+       
+        <h2>Conversation hhhh</h2>
         <ul>
+        {messages.map(message => (
+            <li key={message.id} >
+              <p>{message.content}</p>
+              <small>{new Date(message.sentAt).toLocaleString()}</small>
+            </li>
+          ))}
           {conversationMessages.map(message => (
             <li key={message.id} className={message.senderId === selectedMessage.senderId ? 'received' : 'sent'}>
+              <p>{message.content}</p>
+              <small>{new Date(message.sentAt).toLocaleString()}</small>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }else {
+    return (
+      <div className="message-list">
+        <h2>Messages</h2>
+        <ul>
+        {messages.map(message => (
+            <li key={message.id} >
               <p>{message.content}</p>
               <small>{new Date(message.sentAt).toLocaleString()}</small>
             </li>
@@ -36,6 +57,7 @@ function MessageList({ messages, selectedMessageId }) {
   return (
     <div className="message-list">
       <h2>Select a message to view its details</h2>
+    
     </div>
   );
 }

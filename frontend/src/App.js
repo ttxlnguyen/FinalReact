@@ -22,6 +22,7 @@ function App() {
     selectedChannelId, 
     setSelectedChannelId, 
     sendMessage, 
+
     fetchMessages,
     fetchMessagesByUser
   } = useAppData(isLoggedIn);  // Pass isLoggedIn to useAppData
@@ -60,6 +61,7 @@ function App() {
     selectChannel(channelId);
     setIsChannelListOpen(false);
     if (isLoggedIn) {
+  
       fetchMessages(channelId);
     }
   };
@@ -76,10 +78,12 @@ function App() {
   const handleMessageSubmit = async (e) => {
     e.preventDefault();
     if (inputMessage.trim() !== '' && isLoggedIn) {
+      console.log('Sending message:', inputMessage);
       await sendMessage(inputMessage, selectedChannelId);
       setInputMessage('');
       if (selectedChannelId) {
-        fetchMessages(selectedChannelId);
+        console.log('Channel selected:', selectedChannelId);
+        fetchMessages(selectedChannelId);//Need to refactor this to make fetchMessagesByChannelId
       } else if (selectedMessageId) {
         // If a message is selected, fetch the updated conversation
         const updatedMessages = await fetchMessagesByUser(messages.find(m => m.id === selectedMessageId).senderId);
@@ -114,6 +118,7 @@ function App() {
   if (error) {
     return <div>Error: {error}</div>;
   }
+ 
 
   return (
     <div className="App">

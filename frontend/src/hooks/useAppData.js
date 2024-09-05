@@ -24,6 +24,7 @@ function useAppData(isLoggedIn) {
   }, [isLoggedIn]);
 
   const fetchMessages = useCallback(async (channelId = null) => {
+    console.log('Fetching messages from ' + channelId);
     if (!isLoggedIn) return;
     try {
       setLoading(true);
@@ -70,10 +71,13 @@ function useAppData(isLoggedIn) {
     setSelectedChannelId(channelId);
   };
 
-  const sendMessage = async (content) => {
+  const sendMessage = async (content, channelId = null) => {
     if (!isLoggedIn) return;
+    console.log(channelId);
     try {
-      const newMessage = await postMessage({ content, channelId: selectedChannelId });
+      if(selectedChannelId != undefined) {
+        channelId = selectedChannelId;}
+      const newMessage = await postMessage({ content, channelId });
       setMessages(prevMessages => [...prevMessages, newMessage]);
     } catch (err) {
       setError('Failed to send message: ' + err.message);
