@@ -4,14 +4,11 @@ const API_BASE_URL = 'http://localhost:8080/api';
 
 export const login = async (username, password) => {
   try {
-    // First, authenticate to get the JWT token
     const authResponse = await axios.post(`${API_BASE_URL}/authenticate`, { username, password });
     const token = authResponse.data.id_token;
 
-    // Store the JWT token
     localStorage.setItem('jhi-authenticationToken', token);
 
-    // Now, fetch the user profile using the token
     const userProfileResponse = await axios.get(`${API_BASE_URL}/user-profiles/username/${username}`, {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -19,7 +16,6 @@ export const login = async (username, password) => {
     });
     const userProfile = userProfileResponse.data;
 
-    // Store the user profile
     localStorage.setItem('currentUser', JSON.stringify(userProfile));
 
     return { token, userProfile };
@@ -31,10 +27,42 @@ export const login = async (username, password) => {
 
 export const register = async (username, email, password) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/register`, { login: username, email, password });
-    return response.data;
+    // First, register the user with JHipster's User entity
+    await axios.post(`${API_BASE_URL}/register`, { login: username, email, password });
+
+    // After successful registration, log in to get the token
+    const authResponse = await axios.post(`${API_BASE_URL}/authenticate`, { username, password });
+    const token = authResponse.data.id_token;
+
+    localStorage.setItem('jhi-authenticationToken', token);
+
+    // Create a UserProfile
+    const userProfileResponse = await axios.post(`${API_BASE_URL}/user-profiles`, 
+      { username, email, password },
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    const userProfile = userProfileResponse.data;
+
+    localStorage.setItem('currentUser', JSON.stringify(userProfile));
+
+    return { token, userProfile };
   } catch (error) {
     console.error('Registration failed:', error.response ? error.response.data : error.message);
+    // If the error is due to the user already existing, try to log in
+    if (error.response && error.response.status === 400 && error.response.data.title === 'Login name already used!') {
+      try {
+        const { token, userProfile } = await login(username, password);
+        return { token, userProfile };
+      } catch (loginError) {
+        console.error('Login after registration failed:', loginError.response ? loginError.response.data : loginError.message);
+        throw loginError;
+      }
+    }
     throw error;
   }
 };
@@ -66,8 +94,9 @@ export const checkAuthStatus = () => {
 };
 
 /**
- * 1. Updated login function to first authenticate and get a JWT token.
- * 2. Using the JWT token to fetch the user profile.
- * 3. Storing both the JWT token and the full user profile in localStorage.
- * 4. Kept improved error logging in login and register functions.
+ * Changes made to fix registration:
+ * 1. Updated register function to handle the creation of both User and UserProfile more explicitly.
+ * 2. Added error handling to attempt login if the user already exists.
+ * 3. Removed the separate login call and integrated it into the register function.
+ * 4. Added more detailed error logging for registration and login failures.
  */
