@@ -7,10 +7,11 @@ import MessageList from './components/MessageList';
 import Typingbar from './components/typingbar/Typingbar.js';
 import Login from './components/loginpage/Login.jsx';
 import useAppData from './hooks/useAppData';
-import { isAuthenticated } from './services/auth';
+import { checkAuthStatus, logout } from './services/auth';
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
   const { 
     channels, 
     messages,
@@ -23,7 +24,7 @@ function App() {
     sendMessage, 
     fetchMessages,
     fetchMessagesByUser
-  } = useAppData();
+  } = useAppData(isLoggedIn);  // Pass isLoggedIn to useAppData
 
   const [isChannelListOpen, setIsChannelListOpen] = useState(false);
   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
@@ -31,14 +32,14 @@ function App() {
   const [selectedMessageId, setSelectedMessageId] = useState(null);
 
   useEffect(() => {
-    setIsLoggedIn(isAuthenticated());
+    const checkAuth = async () => {
+      const authStatus = await checkAuthStatus();
+      console.log('Auth status on app load:', authStatus);
+      setIsLoggedIn(authStatus.isAuthenticated);
+      setCurrentUser(authStatus.currentUser);
+    };
+    checkAuth();
   }, []);
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      fetchMessages();
-    }
-  }, [isLoggedIn, fetchMessages]);
 
   const toggleChannelList = () => {
     setIsChannelListOpen(!isChannelListOpen);
@@ -50,13 +51,17 @@ function App() {
     setIsChannelListOpen(false);
     setSelectedChannelId(null);
     setSelectedMessageId(null);
-    fetchMessages();
+    if (isLoggedIn) {
+      fetchMessages();
+    }
   };
 
   const handleChannelSelect = (channelId) => {
     selectChannel(channelId);
     setIsChannelListOpen(false);
-    fetchMessages(channelId);
+    if (isLoggedIn) {
+      fetchMessages(channelId);
+    }
   };
 
   const handleMessageSelect = (messageId) => {
@@ -70,7 +75,7 @@ function App() {
 
   const handleMessageSubmit = async (e) => {
     e.preventDefault();
-    if (inputMessage.trim() !== '') {
+    if (inputMessage.trim() !== '' && isLoggedIn) {
       await sendMessage(inputMessage, selectedChannelId);
       setInputMessage('');
       if (selectedChannelId) {
@@ -85,15 +90,17 @@ function App() {
     }
   };
 
-  // Tempt sudo profile to until we can fetch from backend
-  const user = {
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    password: '******'
+  const handleLoginSuccess = async () => {
+    const authStatus = await checkAuthStatus();
+    console.log('Auth status after login:', authStatus);
+    setIsLoggedIn(authStatus.isAuthenticated);
+    setCurrentUser(authStatus.currentUser);
   };
 
-  const handleLoginSuccess = () => {
-    setIsLoggedIn(true);
+  const handleLogout = () => {
+    logout();
+    setIsLoggedIn(false);
+    setCurrentUser(null);
   };
 
   if (!isLoggedIn) {
@@ -113,8 +120,8 @@ function App() {
       <Sidebar
         toggleChannelList={toggleChannelList}
         toggleMessages={toggleMessages}
-        onLogout={() => setIsLoggedIn(false)}
-        user={user}
+        onLogout={handleLogout}
+        user={currentUser}
       />
 
       {isChannelListOpen && <Channels channels={channels} handleChannelSelect={handleChannelSelect} />}
@@ -145,3 +152,12 @@ function App() {
 }
 
 export default App;
+
+/**
+ * Changes made to address login state update issues:
+ * 1. Added a currentUser state to store the logged-in user's information.
+ * 2. Updated the initial useEffect to use an async function for checking auth status.
+ * 3. Modified handleLoginSuccess to be an async function and update both isLoggedIn and currentUser states.
+ * 4. Updated handleLogout to clear both isLoggedIn and currentUser states.
+ * 5. Passed currentUser to the Sidebar component instead of calling checkAuthStatus() directly.
+ */
