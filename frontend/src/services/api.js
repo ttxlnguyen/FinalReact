@@ -35,6 +35,7 @@ export const getMessages = async () => {
   try {
     const response = await axiosInstance.get('/messages');
     return response.data;
+    // return [];
   } catch (error) {
     handleApiError(error, 'Error fetching messages:');
   }
@@ -52,8 +53,11 @@ export const getMessagesByChannel = async (channelId) => {
 
 export const postMessage = async (messageData) => {
   try {
+    console.log("Im in postMessage");
+    console.log("Channel ID: ", messageData.channelId);
     console.log(messageData);
-    const response = await axiosInstance.post('/messages', messageData);
+   
+    const response = await axiosInstance.post('/messages/channels/' + messageData.channelId, messageData);
     return response.data;
   } catch (error) {
     handleApiError(error, 'Error posting message:');
@@ -64,6 +68,7 @@ export const getChannels = async () => {
   try {
     const response = await axiosInstance.get('/channels');
     return response.data;
+    // return null;
   } catch (error) {
     handleApiError(error, 'Error fetching channels:');
   }
@@ -84,9 +89,10 @@ export const getUserProfile = async () => {
     if (!currentUser || !currentUser.username) {
       console.log('No current user found, skipping profile fetch');
       return null;
-    }
+    }console.log('Current' + currentUser.username); 
     const response = await axiosInstance.get(`/user-profiles/username/${currentUser.username}`);
     return response.data;
+    // return null; // Placeholder, replace with actual API call
   } catch (error) {
     handleApiError(error, 'Error fetching user profile:');
   }

@@ -35,6 +35,7 @@ function Messages({ onSelectMessage }) {
           <li key={message.id} onClick={() => onSelectMessage(message.id)}>
             <p>{message.content.substring(0, 50)}...</p>
             <small>Sent at: {new Date(message.sentAt).toLocaleString()}</small>
+           
           </li>
         ))}
       </ul>
