@@ -39,6 +39,8 @@ function MessageList({ messages, selectedMessageId }) {
       </div>
     );
   }else {
+    // console.log(messages.ma);
+    //Show message content and userProfile username
     return (
       <div className="message-list">
         <h2>Messages</h2>
@@ -47,6 +49,7 @@ function MessageList({ messages, selectedMessageId }) {
             <li key={message.id} >
               <p>{message.content}</p>
               <small>{new Date(message.sentAt).toLocaleString()}</small>
+             <small>{(message.userProfile.username)} </small>
             </li>
           ))}
         </ul>
