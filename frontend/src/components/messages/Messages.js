@@ -9,6 +9,7 @@ function Messages({ onSelectMessage }) {
 
   useEffect(() => {
     const fetchMessages = async () => {
+      console.log('Fetching messages');
       try {
         const fetchedMessages = await getMessages();
         const filteredMessages = fetchedMessages.filter(message => !message.isDeleted);

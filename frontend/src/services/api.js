@@ -43,6 +43,7 @@ export const getMessages = async () => {
 export const getMessagesByChannel = async (channelId) => {
   try {
     const response = await axiosInstance.get(`/messages/channels/${channelId}`);
+    console.log(response.data);
     return response.data;
   } catch (error) {
     handleApiError(error, `Error fetching messages for channel ${channelId}:`);
@@ -51,6 +52,7 @@ export const getMessagesByChannel = async (channelId) => {
 
 export const postMessage = async (messageData) => {
   try {
+    console.log(messageData);
     const response = await axiosInstance.post('/messages', messageData);
     return response.data;
   } catch (error) {

@@ -1,5 +1,6 @@
 import React from 'react';
 import './Channels.css';
+import MessageList from '../MessageList.js'
 
 function Channels({ channels, handleChannelSelect }) {
   return (
@@ -15,7 +16,7 @@ function Channels({ channels, handleChannelSelect }) {
       <ul>
         {channels.map(channel => (
           <li key={channel.id} onClick={() => handleChannelSelect(channel.id)}>
-            # {channel.name}
+            # {channel.name} 
           </li>
         ))}
       </ul>
