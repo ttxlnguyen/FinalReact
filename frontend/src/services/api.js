@@ -98,6 +98,25 @@ export const getUserProfile = async () => {
   }
 };
 
+export const getPublicChannelsByUsername = async (username) => { 
+  try {
+    const response = await axiosInstance.get(`/user-profiles/${username}`);
+    return response.data;
+  } catch (error) {
+    handleApiError(error, `Error fetching public channels for user ${username}:`);
+  }
+};
+
+export const getPrivateChannelsByUsername = async (username) => { 
+  try {
+    const response = await axiosInstance.get(`/userdms/${username}`);
+    return response.data;
+  } catch (error) {
+    handleApiError(error, `Error fetching public channels for user ${username}:`);
+  }
+};
+
+
 export default {
   getMessages,
   getMessagesByChannel,
