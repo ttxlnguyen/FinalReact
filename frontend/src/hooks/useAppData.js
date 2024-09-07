@@ -2,16 +2,19 @@ import { useState, useEffect, useCallback } from 'react';
 import { getChannels, getMessages, getMessagesByChannel, postMessage, getUserProfile, getPublicChannelsByUsername, getPrivateChannelsByUsername } from '../services/api';
 import { getCurrentUser } from '../services/auth';
 
+// Custom hook to manage the application's data
 function useAppData(isLoggedIn) {
-  const [publicChannels, setPublicChannels] = useState([]);
-  const [privateChannels, setPrivateChannels] = useState([]);
-  const [channels, setChannels] = useState([]);
-  const [messages, setMessages] = useState([]);
-  const [selectedChannelId, setSelectedChannelId] = useState(null);
-  const [userProfile, setUserProfile] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  // State variables
+  const [publicChannels, setPublicChannels] = useState([]); // Public channels
+  const [privateChannels, setPrivateChannels] = useState([]); // Private channels
+  const [channels, setChannels] = useState([]); // All channels (might be unused)
+  const [messages, setMessages] = useState([]); // Messages in the current channel
+  const [selectedChannelId, setSelectedChannelId] = useState(null); // Currently selected channel
+  const [userProfile, setUserProfile] = useState(null); // User profile information
+  const [loading, setLoading] = useState(false); // Loading state for async operations
+  const [error, setError] = useState(null); // Error state for async operations
 
+  // Fetch all channels (might be unused)
   const fetchChannels = useCallback(async () => {
     if (!isLoggedIn) return;
     try {
@@ -25,14 +28,12 @@ function useAppData(isLoggedIn) {
     }
   }, [isLoggedIn]);
 
-  // Function to fetch public channels for a specific user
+  // Fetch public channels for a specific user
   const fetchPublicChannels = useCallback(async (username) => {
     if (!isLoggedIn) return;
     try {
       setLoading(true);
-      // Call the API function to get public channels
       const publicChannelsData = await getPublicChannelsByUsername(username);
-      // Update the state with the fetched public channels
       setPublicChannels(publicChannelsData);
     } catch (err) {
       setError('Failed to fetch public channels: ' + err.message);
@@ -41,14 +42,12 @@ function useAppData(isLoggedIn) {
     }
   }, [isLoggedIn]);
 
-  // Function to fetch private channels for a specific user
+  // Fetch private channels for a specific user
   const fetchPrivateChannels = useCallback(async (username) => {
     if (!isLoggedIn) return;
     try {
       setLoading(true);
-      // Call the API function to get private channels
       const privateChannelsData = await getPrivateChannelsByUsername(username);
-      // Update the state with the fetched private channels
       setPrivateChannels(privateChannelsData);
     } catch (err) {
       setError('Failed to fetch private channels: ' + err.message);
@@ -57,7 +56,7 @@ function useAppData(isLoggedIn) {
     }
   }, [isLoggedIn]);
 
-
+  // Fetch messages for a specific channel or all messages
   const fetchMessages = useCallback(async (channelId = null) => {
     console.log('Fetching messages from ' + channelId);
     if (!isLoggedIn) return;
@@ -78,6 +77,7 @@ function useAppData(isLoggedIn) {
     }
   }, [isLoggedIn]);
 
+  // Fetch user profile
   const fetchUserProfile = useCallback(async () => {
     if (!isLoggedIn) return;
     try {
@@ -88,31 +88,33 @@ function useAppData(isLoggedIn) {
     }
   }, [isLoggedIn]);
 
+  // Effect to fetch initial data when user logs in
   useEffect(() => {
     if (isLoggedIn) {
       fetchChannels();
-      // fetchMessages();
+      // fetchMessages(); // Commented out, might be unnecessary
       fetchUserProfile();
       const currentUser = getCurrentUser();
       if (currentUser && currentUser.username) {
-        // Fetch both public and private channels when the user is logged in
         fetchPublicChannels(currentUser.username);
         fetchPrivateChannels(currentUser.username);
       }
     }
   }, [isLoggedIn, fetchChannels, fetchUserProfile, fetchPublicChannels, fetchPrivateChannels]);
 
-
+  // Effect to fetch messages when a channel is selected
   useEffect(() => {
     if (isLoggedIn && selectedChannelId) {
       fetchMessages(selectedChannelId);
     }
   }, [isLoggedIn, selectedChannelId, fetchMessages]);
 
+  // Function to select a channel
   const selectChannel = (channelId) => {
     setSelectedChannelId(channelId);
   };
 
+  // Function to send a message
   const sendMessage = async (content, channelId = null) => {
     if (!isLoggedIn) return;
     console.log(channelId);
@@ -128,6 +130,7 @@ function useAppData(isLoggedIn) {
     }
   };
 
+  // Return the hook's API
   return { 
     channels, 
     publicChannels,
