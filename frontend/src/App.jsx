@@ -3,7 +3,7 @@ import './App.css';
 import Sidebar from './components/sidebar/Sidebar.js';
 import Channels from './components/channels/Channels.js';
 import Messages from './components/messages/Messages.js';
-import MessageList from './components/MessageList';
+import ChannelContent from './components/channelContent/ChannelContent';
 import Typingbar from './components/typingbar/Typingbar.js';
 import Login from './components/loginpage/Login.jsx';
 
@@ -22,7 +22,7 @@ const MainContent = ({ selectedChannelId, publicChannels, privateChannels, messa
       </h1>
     </header>
     
-    <MessageList 
+    <ChannelContent 
       messages={messages}
       selectedChannelId={selectedChannelId}
     />
