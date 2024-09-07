@@ -13,7 +13,6 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const { 
-    channels, 
     publicChannels,
     privateChannels,
     messages,
@@ -25,15 +24,13 @@ function App() {
     setSelectedChannelId, 
     sendMessage, 
     fetchMessages,
-    fetchMessagesByUser,
     fetchPublicChannels,
     fetchPrivateChannels
-  } = useAppData(isLoggedIn);  // Pass isLoggedIn to useAppData
+  } = useAppData(isLoggedIn);
 
   const [isChannelListOpen, setIsChannelListOpen] = useState(false);
   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
-  const [selectedMessageId, setSelectedMessageId] = useState(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -60,24 +57,16 @@ function App() {
   const toggleMessages = () => {
     setIsMessagesOpen(!isMessagesOpen);
     setIsChannelListOpen(false);
-    setSelectedChannelId(null);
-    setSelectedMessageId(null);
-    if (isLoggedIn) {
-      fetchMessages();
-    }
+   // setSelectedChannelId(null); // UNCOMMENT IF BREAKS
   };
 
   const handleChannelSelect = (channelId) => {
     selectChannel(channelId);
     setIsChannelListOpen(false);
+    setIsMessagesOpen(false);
     if (isLoggedIn) {
       fetchMessages(channelId);
     }
-  };
-
-  const handleMessageSelect = (messageId) => {
-    setSelectedMessageId(messageId);
-    setIsMessagesOpen(false);
   };
 
   const handleInputChange = (e) => {
@@ -93,10 +82,6 @@ function App() {
       if (selectedChannelId) {
         console.log('Channel selected:', selectedChannelId);
         fetchMessages(selectedChannelId);
-      } else if (selectedMessageId) {
-        // If a message is selected, fetch the updated conversation
-        const updatedMessages = await fetchMessagesByUser(messages.find(m => m.id === selectedMessageId).senderId);
-        setMessages(updatedMessages);
       } else {
         fetchMessages();
       }
@@ -139,29 +124,34 @@ function App() {
 
       {isChannelListOpen && (
         <Channels 
-          channels={channels}
           publicChannels={publicChannels}
+          handleChannelSelect={handleChannelSelect}
+        />
+      )}
+
+      {isMessagesOpen && (
+        <Messages 
           privateChannels={privateChannels}
           handleChannelSelect={handleChannelSelect}
         />
       )}
-      {isMessagesOpen && <Messages messages={messages} onSelectMessage={handleMessageSelect} />}
 
       <div className="main-content">
         <header className="main-header">
           <h1>
             {selectedChannelId 
-              ? `# ${channels.find(c => c.id === selectedChannelId)?.name || 
-                   publicChannels.find(c => c.id === selectedChannelId)?.name || 
-                   privateChannels.find(c => c.id === selectedChannelId)?.name}`
-              : 'All Messages'
+              ? `${privateChannels.find(c => c.id === selectedChannelId) ? '@' : '#'} ${
+                  publicChannels.find(c => c.id === selectedChannelId)?.name || 
+                  privateChannels.find(c => c.id === selectedChannelId)?.name
+                }`
+              : 'Select a channel'
             }
           </h1>
         </header>
         
         <MessageList 
           messages={messages}
-          selectedMessageId={selectedMessageId}
+          selectedChannelId={selectedChannelId}
         />
         <Typingbar
           inputMessage={inputMessage}

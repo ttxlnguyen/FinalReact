@@ -92,7 +92,7 @@ function useAppData(isLoggedIn) {
   useEffect(() => {
     if (isLoggedIn) {
       fetchChannels();
-      fetchMessages();
+      // fetchMessages();
       fetchUserProfile();
       const currentUser = getCurrentUser();
       if (currentUser && currentUser.username) {
@@ -101,7 +101,7 @@ function useAppData(isLoggedIn) {
         fetchPrivateChannels(currentUser.username);
       }
     }
-  }, [isLoggedIn, fetchChannels, fetchMessages, fetchUserProfile, fetchPublicChannels, fetchPrivateChannels]);
+  }, [isLoggedIn, fetchChannels, fetchUserProfile, fetchPublicChannels, fetchPrivateChannels]);
 
   useEffect(() => {
     if (isLoggedIn && selectedChannelId) {
@@ -117,9 +117,11 @@ function useAppData(isLoggedIn) {
     if (!isLoggedIn) return;
     console.log(channelId);
     try {
-      if(selectedChannelId != undefined) {
-        channelId = selectedChannelId;}
-      const newMessage = await postMessage({ content, channelId });
+      const actualChannelId = channelId || selectedChannelId;
+      if (!actualChannelId) {
+        throw new Error('No channel selected');
+      }
+      const newMessage = await postMessage({ content, channelId: actualChannelId });
       setMessages(prevMessages => [...prevMessages, newMessage]);
     } catch (err) {
       setError('Failed to send message: ' + err.message);
