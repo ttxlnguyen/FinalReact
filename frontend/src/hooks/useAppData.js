@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getChannels, getMessages, getMessagesByChannel, postMessage, getUserProfile } from '../services/api';
+import { getChannels, getMessages, getMessagesByChannel, postMessage, getUserProfile, getPublicChannelsByUsername } from '../services/api';
 import { getCurrentUser } from '../services/auth';
 
 function useAppData(isLoggedIn) {
+  const [publicChannels, setPublicChannels] = useState([]);
+  const [privateChannels, setPrivateChannels] = useState([]);
   const [channels, setChannels] = useState([]);
   const [messages, setMessages] = useState([]);
   const [selectedChannelId, setSelectedChannelId] = useState(null);
@@ -22,6 +24,29 @@ function useAppData(isLoggedIn) {
       setLoading(false);
     }
   }, [isLoggedIn]);
+
+  const fetchPublicChannels =
+  useCallback(async () => {
+    if (!isLoggedIn) return;
+    try {
+      const publicChannelsData = await getPublicChannelsByUsername();
+      setPublicChannels(publicChannelsData);
+    } catch (err) {
+      setError('Failed to fetch user profile: ' + err.message);
+    }
+  }, [isLoggedIn]);
+  //  useCallback(async (username) => {
+  //   if (!isLoggedIn) return;
+  //   try{
+  //     setLoading(true);
+  //     const publicChannelData = await getPublicChannelsByUsername(username);
+  //     setPublicChannels(publicChannelData);
+  //   }catch(err){
+  //     setError('Failed to fetch public channels for user'+ username + ':'+ err.message);
+  //   }finally {
+  //     setLoading(false);
+  // }
+  // }, [isLoggedIn]);
 
   const fetchMessages = useCallback(async (channelId = null) => {
     console.log('Fetching messages from ' + channelId);
@@ -56,10 +81,12 @@ function useAppData(isLoggedIn) {
   useEffect(() => {
     if (isLoggedIn) {
       fetchChannels();
+  
+    //  fetchPublicChannels();
       fetchMessages();
       fetchUserProfile();
     }
-  }, [isLoggedIn, fetchChannels, fetchMessages, fetchUserProfile]);
+  }, [isLoggedIn, fetchChannels,  fetchMessages, fetchUserProfile]); //fetchPublicChannels
 
   useEffect(() => {
     if (isLoggedIn && selectedChannelId) {
@@ -94,7 +121,10 @@ function useAppData(isLoggedIn) {
     selectedChannelId,
     setSelectedChannelId,
     sendMessage,
-    fetchMessages
+    fetchMessages,
+    fetchPublicChannels,
+    publicChannels
+    
   };
 }
 

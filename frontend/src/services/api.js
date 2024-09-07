@@ -66,7 +66,12 @@ export const postMessage = async (messageData) => {
 
 export const getChannels = async () => {
   try {
-    const response = await axiosInstance.get('/channels');
+    const currentUser = getCurrentUser();
+    if (!currentUser ||!currentUser.username) {
+      console.log('No current user found, skipping channel fetch');
+      return null;
+    }console.log('Currenttttttttttttt' + currentUser.username);  // For testing, replace with actual API call
+    const response = await axiosInstance.get(`/channels/user-profile/${currentUser.username}`);
     return response.data;
     // return null;
   } catch (error) {
@@ -100,7 +105,12 @@ export const getUserProfile = async () => {
 
 export const getPublicChannelsByUsername = async (username) => { 
   try {
-    const response = await axiosInstance.get(`/user-profiles/${username}`);
+    const currentUser = getCurrentUser();
+    if (!currentUser || !currentUser.username) {
+      console.log('No current user found, skipping profile fetch');
+      return null;
+    }console.log('Current' + currentUser.username);
+    const response = await axiosInstance.get(`/channels/user-profile/${currentUser.username}`);
     return response.data;
   } catch (error) {
     handleApiError(error, `Error fetching public channels for user ${username}:`);
@@ -109,7 +119,7 @@ export const getPublicChannelsByUsername = async (username) => {
 
 export const getPrivateChannelsByUsername = async (username) => { 
   try {
-    const response = await axiosInstance.get(`/userdms/${username}`);
+    const response = await axiosInstance.get(`/channels/userdms/${username}`);
     return response.data;
   } catch (error) {
     handleApiError(error, `Error fetching public channels for user ${username}:`);
@@ -124,6 +134,8 @@ export default {
   getChannels,
   getChannel,
   getUserProfile,
+  getPublicChannelsByUsername,
+  getPrivateChannelsByUsername,
 };
 
 /**
