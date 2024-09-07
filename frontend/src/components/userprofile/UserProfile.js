@@ -1,9 +1,13 @@
 import React from 'react';
 import './UserProfile.css';
+import { getCurrentUser } from '../../services/auth';
 
 // UserProfile component
 // This component displays the user's profile information in a popup
-function UserProfile({ user, onClose }) {
+function UserProfile({ onClose }) {
+  // Get the current user's information
+  const currentUser = getCurrentUser();
+
   return (
     <div className="user-profile-popup">
       <div className="user-profile-header">
@@ -11,9 +15,13 @@ function UserProfile({ user, onClose }) {
         <button onClick={onClose} className="close-button">X</button>
       </div>
       <div className="user-profile-info">
-        <p><strong>Name:</strong> {user.name}</p>
-        <p><strong>Email:</strong> {user.email}</p>
-        <p><strong>Password:</strong> {user.password}</p>
+        <p><strong>Name:</strong> {currentUser ? currentUser.username : 'N/A'}</p>
+        {currentUser && currentUser.email && (
+          <p><strong>Email:</strong> {currentUser.email}</p>
+        )}
+        {currentUser && currentUser.password && (
+          <p><strong>Password:</strong> {currentUser.password}</p>
+        )}
       </div>
     </div>
   );
