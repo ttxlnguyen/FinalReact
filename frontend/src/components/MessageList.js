@@ -1,68 +1,51 @@
-import React from 'react';
+// import React from 'react';
 
-function MessageList({ messages, selectedMessageId }) {
-  const filteredMessages = messages.filter(message => !message.isDeleted);
+// function MessageList({ messages, selectedChannelId }) {
+//   const filteredMessages = messages.filter(message => !message.isDeleted);
 
-  if (filteredMessages.length === 0) {
-    return <div>No messages to display.</div>;
-  }
+//   if (filteredMessages.length === 0) {
+//     return <div>No messages to display.</div>;
+//   }
 
-  if (selectedMessageId) {
-    const selectedMessage = filteredMessages.find(message => message.id === selectedMessageId);
-    if (!selectedMessage) {
-      return <div>Message not found or has been deleted.</div>;
-    }
-    
-    // Find all messages in the conversation
-    const conversationMessages = filteredMessages.filter(
-      message => message.senderId === selectedMessage.senderId || message.receiverId === selectedMessage.senderId
-    );
+//   if (selectedChannelId) {
+//     return (
+//       <div className="message-list">
+//         <h2>Messages</h2>
+//         <ul>
+//           {filteredMessages.map(message => (
+//             <li key={message.id}>
+//               <p>{message.content}</p>
+//               <small>{new Date(message.sentAt).toLocaleString()}</small>
+//               <small>{message.userProfile?.username || 'Unknown User'}</small>
+//             </li>
+//           ))}
+//         </ul>
+//       </div>
+//     );
+//   } else {
 
-    return (
-      <div className="message-conversation">
-       
-        <h2>Conversation hhhh</h2>
-        <ul>
-        {messages.map(message => (
-            <li key={message.id} >
-              <p>{message.content}</p>
-              <small>{new Date(message.sentAt).toLocaleString()}</small>
-            </li>
-          ))}
-          {conversationMessages.map(message => (
-            <li key={message.id} className={message.senderId === selectedMessage.senderId ? 'received' : 'sent'}>
-              <p>{message.content}</p>
-              <small>{new Date(message.sentAt).toLocaleString()}</small>
-            </li>
-          ))}
-        </ul>
-      </div>
-    );
-  }else {
-    // console.log(messages.ma);
-    //Show message content and userProfile username
-    return (
-      <div className="message-list">
-        <h2>Messages</h2>
-        <ul>
-        {messages.map(message => (
-            <li key={message.id} >
-              <p>{message.content}</p>
-              <small>{new Date(message.sentAt).toLocaleString()}</small>
-             <small>{(message.userProfile.username)} </small>
-            </li>
-          ))}
-        </ul>
-      </div>
-    );
-  }
+//     //Show message content and userProfile username
+//     return (
+//       <div className="message-list">
+//         <h2>Messages</h2>
+//         <ul>
+//         {messages.map(message => (
+//             <li key={message.id} >
+//               <p>{message.content}</p>
+//               <small>{new Date(message.sentAt).toLocaleString()}</small>
+//               <small>  {message.userProfile?.username || 'Unknown User'}</small>
+//             </li>
+//           ))}
+//         </ul>
+//       </div>
+//     );
+//   }
 
-  return (
-    <div className="message-list">
-      <h2>Select a message to view its details</h2>
-    
-    </div>
-  );
-}
+//   return (
+//     <div className="message-list">
+//       <h2>Select a channel to view its messages</h2>
+//     </div>
+//   );
+// }
 
-export default MessageList;
+// export default MessageList;

@@ -35,7 +35,6 @@ export const getMessages = async () => {
   try {
     const response = await axiosInstance.get('/messages');
     return response.data;
-    // return [];
   } catch (error) {
     handleApiError(error, 'Error fetching messages:');
   }
@@ -56,7 +55,7 @@ export const postMessage = async (messageData) => {
     console.log("Im in postMessage");
     console.log("Channel ID: ", messageData.channelId);
     console.log(messageData);
-   
+
     const response = await axiosInstance.post('/messages/channels/' + messageData.channelId, messageData);
     return response.data;
   } catch (error) {
@@ -73,7 +72,6 @@ export const getChannels = async () => {
     }console.log('Currenttttttttttttt' + currentUser.username);  // For testing, replace with actual API call
     const response = await axiosInstance.get(`/channels/user-profile/${currentUser.username}`);
     return response.data;
-    // return null;
   } catch (error) {
     handleApiError(error, 'Error fetching channels:');
   }
@@ -94,38 +92,38 @@ export const getUserProfile = async () => {
     if (!currentUser || !currentUser.username) {
       console.log('No current user found, skipping profile fetch');
       return null;
-    }console.log('Current' + currentUser.username); 
+    }
+    console.log('Current user:', currentUser.username);
     const response = await axiosInstance.get(`/user-profiles/username/${currentUser.username}`);
     return response.data;
-    // return null; // Placeholder, replace with actual API call
   } catch (error) {
     handleApiError(error, 'Error fetching user profile:');
   }
 };
 
+// Function to fetch public channels for a specific user
+// This function makes a GET request to the /channels/user-profile/{username} endpoint
+// It returns an array of public channels accessible to the user
 export const getPublicChannelsByUsername = async (username) => { 
   try {
-    const currentUser = getCurrentUser();
-    if (!currentUser || !currentUser.username) {
-      console.log('No current user found, skipping profile fetch');
-      return null;
-    }console.log('Current' + currentUser.username);
-    const response = await axiosInstance.get(`/channels/user-profile/${currentUser.username}`);
+    const response = await axiosInstance.get(`/channels/user-profile/${username}`);
     return response.data;
   } catch (error) {
     handleApiError(error, `Error fetching public channels for user ${username}:`);
   }
 };
 
+// Function to fetch private channels for a specific user
+// This function makes a GET request to the /channels/userdms/{username} endpoint
+// It returns an array of private channels (direct messages) for the user
 export const getPrivateChannelsByUsername = async (username) => { 
   try {
     const response = await axiosInstance.get(`/channels/userdms/${username}`);
     return response.data;
   } catch (error) {
-    handleApiError(error, `Error fetching public channels for user ${username}:`);
+    handleApiError(error, `Error fetching private channels for user ${username}:`);
   }
 };
-
 
 export default {
   getMessages,
@@ -137,10 +135,3 @@ export default {
   getPublicChannelsByUsername,
   getPrivateChannelsByUsername,
 };
-
-/**
- * Changes made to address authentication issues:
- * 1. Kept the axios interceptor using Bearer token authentication.
- * 2. Ensured all API calls use the axiosInstance with the correct headers.
- * 3. Kept improved error handling and logging for API requests.
- */

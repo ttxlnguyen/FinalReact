@@ -1,8 +1,8 @@
 import React from 'react';
 import './Channels.css';
-import MessageList from '../MessageList.js'
+//import MessageList from '../MessageList.js'
 
-function Channels({ channels, handleChannelSelect }) {
+function Channels({ publicChannels, handleChannelSelect }) {
   return (
     <div className="channel-list">
       <h2>Channels
@@ -13,12 +13,24 @@ function Channels({ channels, handleChannelSelect }) {
           </svg>
         </button>
       </h2>
+      <h3>Public Channels</h3>
       <ul>
-        {channels.map(channel => (
-          <li key={channel.id} onClick={() => handleChannelSelect(channel.id)}>
+        {/* Map through publicChannels array and create a list item for each channel */}
+        {publicChannels.map(channel => (
+          <li key={channel.id} onClick={() => handleChannelSelect(channel.id, 'public')}>
             # {channel.name} 
           </li>
         ))}
+        {/* Commented out All Channels section
+      <h3>All Channels</h3>
+      <ul>
+        {channels.map(channel => (
+          <li key={channel.id} onClick={() => handleChannelSelect(channel.id, 'all')}>
+            # {channel.name} 
+          </li>
+        ))}
+      </ul>
+      */}
       </ul>
     </div>
   );

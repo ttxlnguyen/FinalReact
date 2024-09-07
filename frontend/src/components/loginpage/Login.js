@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { login, register, checkAuthStatus } from '../../services/auth';
 
 export function useLogin(onLoginSuccess) {
+  // State for form data, errors, and registration mode
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -11,20 +12,25 @@ export function useLogin(onLoginSuccess) {
   const [registrationError, setRegistrationError] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
 
+  // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
+  // Handle login form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     try {
       console.log('Attempting login with:', formData);
+      // Call the login function from auth.js
       const result = await login(formData.username, formData.password);
       console.log('Login successful, user profile:', result.userProfile);
+      // Check authentication status after login
       const authStatus = await checkAuthStatus();
       console.log('Auth status after login:', authStatus);
+      // Call the onLoginSuccess callback with the token
       onLoginSuccess(result.token);
     } catch (err) {
       setError('Login failed. Please check your credentials.');
@@ -33,15 +39,19 @@ export function useLogin(onLoginSuccess) {
     }
   };
 
+  // Handle registration form submission
   const handleRegister = async (e) => {
     e.preventDefault();
     setRegistrationError('');
     try {
       console.log('Attempting registration with:', formData);
+      // Call the register function from auth.js
       const result = await register(formData.username, formData.email, formData.password);
       console.log('Registration successful, user profile:', result.userProfile);
+      // Check authentication status after registration
       const authStatus = await checkAuthStatus();
       console.log('Auth status after registration:', authStatus);
+      // Call the onLoginSuccess callback with the token
       onLoginSuccess(result.token);
     } catch (err) {
       setRegistrationError('Registration failed. Please try again.');
@@ -50,12 +60,14 @@ export function useLogin(onLoginSuccess) {
     }
   };
 
+  // Toggle between login and registration forms
   const toggleRegistration = () => {
     setIsRegistering(!isRegistering);
     setError('');
     setRegistrationError('');
   };
 
+  // Log detailed error information for debugging
   const logError = (err) => {
     if (err.response) {
       console.error('Error response:', err.response.data);
@@ -68,6 +80,7 @@ export function useLogin(onLoginSuccess) {
     }
   };
 
+  // Return all necessary state and functions for the login component
   return {
     formData,
     setFormData,
@@ -83,9 +96,19 @@ export function useLogin(onLoginSuccess) {
 }
 
 /**
- * Changes made to fix registration:
- * 1. Added a separate handleRegister function for registration.
- * 2. Added registrationError state to handle registration-specific errors.
- * 3. Updated error handling to set appropriate error messages for login and registration.
- * 4. Kept detailed logging for debugging purposes.
+ * Login Process:
+ * 1. User enters credentials in the login form.
+ * 2. handleSubmit is called when the form is submitted.
+ * 3. login function from auth.js is called with the username and password.
+ * 4. If login is successful, onLoginSuccess is called with the token.
+ * 5. If login fails, an error message is displayed.
+ * 
+ * Registration Process:
+ * 1. User enters details in the registration form.
+ * 2. handleRegister is called when the form is submitted.
+ * 3. register function from auth.js is called with the username, email, and password.
+ * 4. If registration is successful, onLoginSuccess is called with the token.
+ * 5. If registration fails, an error message is displayed.
+ * 
+ * Both processes use checkAuthStatus to verify the authentication state after login/registration.
  */

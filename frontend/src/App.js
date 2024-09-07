@@ -1,38 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';
-import Sidebar from './components/sidebar/Sidebar.js';
-import Channels from './components/channels/Channels.js';
-import Messages from './components/messages/Messages.js';
-import MessageList from './components/MessageList';
-import Typingbar from './components/typingbar/Typingbar.js';
-import Login from './components/loginpage/Login.jsx';
+import AppJSX from './App.jsx';
 import useAppData from './hooks/useAppData';
 import { checkAuthStatus, logout } from './services/auth';
 
 function App() {
+  // State management
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [isChannelListOpen, setIsChannelListOpen] = useState(false);
+  const [isMessagesOpen, setIsMessagesOpen] = useState(false);
+  const [inputMessage, setInputMessage] = useState('');
+
+  // Custom hook for app data
   const { 
     publicChannels,
-    channels, 
+    privateChannels,
     messages,
     setMessages, 
     loading, 
     error, 
     selectChannel, 
-    selectedChannelId, 
+    selectedChannelId,
     setSelectedChannelId, 
     sendMessage, 
-
     fetchMessages,
-    fetchMessagesByUser
-  } = useAppData(isLoggedIn);  // Pass isLoggedIn to useAppData
+    fetchPublicChannels,
+    fetchPrivateChannels
+  } = useAppData(isLoggedIn);
 
-  const [isChannelListOpen, setIsChannelListOpen] = useState(false);
-  const [isMessagesOpen, setIsMessagesOpen] = useState(false);
-  const [inputMessage, setInputMessage] = useState('');
-  const [selectedMessageId, setSelectedMessageId] = useState(null);
-
+  // Check authentication status on component mount
   useEffect(() => {
     const checkAuth = async () => {
       const authStatus = await checkAuthStatus();
@@ -43,39 +39,42 @@ function App() {
     checkAuth();
   }, []);
 
+  // Fetch channels when user is logged in
+  useEffect(() => {
+    if (isLoggedIn && currentUser && currentUser.username) {
+      fetchPublicChannels(currentUser.username);
+      fetchPrivateChannels(currentUser.username);
+    }
+  }, [isLoggedIn, currentUser, fetchPublicChannels, fetchPrivateChannels]);
+
+  // Toggle channel list visibility
   const toggleChannelList = () => {
     setIsChannelListOpen(!isChannelListOpen);
     setIsMessagesOpen(false);
   };
 
+  // Toggle messages visibility
   const toggleMessages = () => {
     setIsMessagesOpen(!isMessagesOpen);
     setIsChannelListOpen(false);
-    setSelectedChannelId(null);
-    setSelectedMessageId(null);
-    if (isLoggedIn) {
-      fetchMessages();
-    }
   };
 
+  // Handle channel selection
   const handleChannelSelect = (channelId) => {
     selectChannel(channelId);
     setIsChannelListOpen(false);
+    setIsMessagesOpen(false);
     if (isLoggedIn) {
-  
       fetchMessages(channelId);
     }
   };
 
-  const handleMessageSelect = (messageId) => {
-    setSelectedMessageId(messageId);
-    setIsMessagesOpen(false);
-  };
-
+  // Handle input change for message typing
   const handleInputChange = (e) => {
     setInputMessage(e.target.value);
   };
 
+  // Handle message submission
   const handleMessageSubmit = async (e) => {
     e.preventDefault();
     if (inputMessage.trim() !== '' && isLoggedIn) {
@@ -84,17 +83,14 @@ function App() {
       setInputMessage('');
       if (selectedChannelId) {
         console.log('Channel selected:', selectedChannelId);
-        fetchMessages(selectedChannelId);//Need to refactor this to make fetchMessagesByChannelId
-      } else if (selectedMessageId) {
-        // If a message is selected, fetch the updated conversation
-        const updatedMessages = await fetchMessagesByUser(messages.find(m => m.id === selectedMessageId).senderId);
-        setMessages(updatedMessages);
+        fetchMessages(selectedChannelId);
       } else {
         fetchMessages();
       }
     }
   };
 
+  // Handle successful login
   const handleLoginSuccess = async () => {
     const authStatus = await checkAuthStatus();
     console.log('Auth status after login:', authStatus);
@@ -102,68 +98,36 @@ function App() {
     setCurrentUser(authStatus.currentUser);
   };
 
+  // Handle logout
   const handleLogout = () => {
     logout();
     setIsLoggedIn(false);
     setCurrentUser(null);
   };
 
-  if (!isLoggedIn) {
-    return <Login onLoginSuccess={handleLoginSuccess} />;
-  }
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
- 
-
+  // Render the JSX component with all necessary props
   return (
-    <div className="App">
-      <Sidebar
-        toggleChannelList={toggleChannelList}
-        toggleMessages={toggleMessages}
-        onLogout={handleLogout}
-        user={currentUser}
-      />
-
-      {isChannelListOpen && <Channels channels={channels} handleChannelSelect={handleChannelSelect} />}
-      {isMessagesOpen && <Messages messages={messages} onSelectMessage={handleMessageSelect} />}
-
-      <div className="main-content">
-        <header className="main-header">
-          <h1>
-            {selectedChannelId 
-              ? `# ${channels.find(c => c.id === selectedChannelId)?.name}`
-              : 'All Messages'
-            }
-          </h1>
-        </header>
-        
-        <MessageList 
-          messages={messages}
-          selectedMessageId={selectedMessageId}
-        />
-        <Typingbar
-          inputMessage={inputMessage}
-          handleInputChange={handleInputChange}
-          handleMessageSubmit={handleMessageSubmit}
-        />
-      </div>
-    </div>
+    <AppJSX
+      isLoggedIn={isLoggedIn}
+      currentUser={currentUser}
+      publicChannels={publicChannels}
+      privateChannels={privateChannels}
+      messages={messages}
+      selectedChannelId={selectedChannelId}
+      inputMessage={inputMessage}
+      isChannelListOpen={isChannelListOpen}
+      isMessagesOpen={isMessagesOpen}
+      loading={loading}
+      error={error}
+      toggleChannelList={toggleChannelList}
+      toggleMessages={toggleMessages}
+      handleChannelSelect={handleChannelSelect}
+      handleInputChange={handleInputChange}
+      handleMessageSubmit={handleMessageSubmit}
+      handleLoginSuccess={handleLoginSuccess}
+      handleLogout={handleLogout}
+    />
   );
 }
 
 export default App;
-
-/**
- * Changes made to address login state update issues:
- * 1. Added a currentUser state to store the logged-in user's information.
- * 2. Updated the initial useEffect to use an async function for checking auth status.
- * 3. Modified handleLoginSuccess to be an async function and update both isLoggedIn and currentUser states.
- * 4. Updated handleLogout to clear both isLoggedIn and currentUser states.
- * 5. Passed currentUser to the Sidebar component instead of calling checkAuthStatus() directly.
- */
