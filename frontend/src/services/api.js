@@ -3,11 +3,13 @@ import { getAuthToken, getCurrentUser } from './auth';
 
 const API_BASE_URL = 'http://localhost:8080/api';
 
+// Create an axios instance with base configuration
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
 });
 
+// Add an interceptor to include the auth token in every request
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = getAuthToken();
@@ -21,6 +23,7 @@ axiosInstance.interceptors.request.use(
   }
 );
 
+// Helper function to handle API errors
 const handleApiError = (error, errorMessage) => {
   console.error(errorMessage, error);
   if (error.response) {
@@ -31,6 +34,7 @@ const handleApiError = (error, errorMessage) => {
   throw error;
 };
 
+// Fetch all messages (seems unused, consider removing if not needed)
 export const getMessages = async () => {
   try {
     const response = await axiosInstance.get('/messages');
@@ -40,6 +44,7 @@ export const getMessages = async () => {
   }
 };
 
+// Fetch messages for a specific channel
 export const getMessagesByChannel = async (channelId) => {
   try {
     const response = await axiosInstance.get(`/messages/channels/${channelId}`);
@@ -50,10 +55,10 @@ export const getMessagesByChannel = async (channelId) => {
   }
 };
 
+// Post a new message to a channel
 export const postMessage = async (messageData) => {
   try {
-    console.log("Im in postMessage");
-    console.log("Channel ID: ", messageData.channelId);
+    console.log("Posting message to channel ID:", messageData.channelId);
     console.log(messageData);
 
     const response = await axiosInstance.post('/messages/channels/' + messageData.channelId, messageData);
@@ -63,13 +68,15 @@ export const postMessage = async (messageData) => {
   }
 };
 
+// Fetch all channels for the current user (seems unused, consider removing if not needed)
 export const getChannels = async () => {
   try {
     const currentUser = getCurrentUser();
-    if (!currentUser ||!currentUser.username) {
+    if (!currentUser || !currentUser.username) {
       console.log('No current user found, skipping channel fetch');
       return null;
-    }console.log('Currenttttttttttttt' + currentUser.username);  // For testing, replace with actual API call
+    }
+    console.log('Current user:', currentUser.username);
     const response = await axiosInstance.get(`/channels/user-profile/${currentUser.username}`);
     return response.data;
   } catch (error) {
@@ -77,6 +84,7 @@ export const getChannels = async () => {
   }
 };
 
+// Fetch a specific channel by ID (seems unused, consider removing if not needed)
 export const getChannel = async (channelId) => {
   try {
     const response = await axiosInstance.get(`/channels/${channelId}`);
@@ -86,6 +94,7 @@ export const getChannel = async (channelId) => {
   }
 };
 
+// Fetch the user profile for the current user
 export const getUserProfile = async () => {
   try {
     const currentUser = getCurrentUser();
@@ -101,9 +110,7 @@ export const getUserProfile = async () => {
   }
 };
 
-// Function to fetch public channels for a specific user
-// This function makes a GET request to the /channels/user-profile/{username} endpoint
-// It returns an array of public channels accessible to the user
+// Fetch public channels for a specific user
 export const getPublicChannelsByUsername = async (username) => { 
   try {
     const response = await axiosInstance.get(`/channels/user-profile/${username}`);
@@ -113,9 +120,7 @@ export const getPublicChannelsByUsername = async (username) => {
   }
 };
 
-// Function to fetch private channels for a specific user
-// This function makes a GET request to the /channels/userdms/{username} endpoint
-// It returns an array of private channels (direct messages) for the user
+// Fetch private channels (direct messages) for a specific user
 export const getPrivateChannelsByUsername = async (username) => { 
   try {
     const response = await axiosInstance.get(`/channels/userdms/${username}`);
@@ -125,6 +130,7 @@ export const getPrivateChannelsByUsername = async (username) => {
   }
 };
 
+// Export all functions as a default object
 export default {
   getMessages,
   getMessagesByChannel,

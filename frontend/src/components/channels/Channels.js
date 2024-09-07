@@ -1,11 +1,14 @@
 import React from 'react';
 import './Channels.css';
-//import MessageList from '../MessageList.js'
 
+
+// Channels component to display a list of public channels
 function Channels({ publicChannels, handleChannelSelect }) {
   return (
     <div className="channel-list">
-      <h2>Channels
+      <h2>
+        Channels
+        {/* Button to add a new channel (functionality not implemented yet) */}
         <button className='add-channel-btn'>
           <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 2 24 24" width="20px" fill="#e8eaed">
             <path d="M0 0h24v24H0z" fill="none"/>
@@ -17,11 +20,17 @@ function Channels({ publicChannels, handleChannelSelect }) {
       <ul>
         {/* Map through publicChannels array and create a list item for each channel */}
         {publicChannels.map(channel => (
-          <li key={channel.id} onClick={() => handleChannelSelect(channel.id, 'public')}>
+          <li 
+            key={channel.id} 
+            onClick={() => handleChannelSelect(channel.id, 'public')}
+          >
             # {channel.name} 
           </li>
         ))}
-        {/* Commented out All Channels section
+      </ul>
+      {/* 
+        Commented out All Channels section
+        This section might be used in the future to display all channels (both public and private)
       <h3>All Channels</h3>
       <ul>
         {channels.map(channel => (
@@ -31,7 +40,6 @@ function Channels({ publicChannels, handleChannelSelect }) {
         ))}
       </ul>
       */}
-      </ul>
     </div>
   );
 }

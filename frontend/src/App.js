@@ -5,13 +5,13 @@ import { checkAuthStatus, logout } from './services/auth';
 
 function App() {
   // State management
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
-  const [isChannelListOpen, setIsChannelListOpen] = useState(false);
-  const [isMessagesOpen, setIsMessagesOpen] = useState(false);
-  const [inputMessage, setInputMessage] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Tracks user's login status
+  const [currentUser, setCurrentUser] = useState(null); // Stores current user's information
+  const [isChannelListOpen, setIsChannelListOpen] = useState(false); // Controls visibility of channel list
+  const [isMessagesOpen, setIsMessagesOpen] = useState(false); // Controls visibility of messages
+  const [inputMessage, setInputMessage] = useState(''); // Stores the current message being typed
 
-  // Custom hook for app data
+  // Custom hook for managing app data (channels, messages, etc.)
   const { 
     publicChannels,
     privateChannels,
@@ -28,7 +28,7 @@ function App() {
     fetchPrivateChannels
   } = useAppData(isLoggedIn);
 
-  // Check authentication status on component mount
+  // Check authentication status when the component mounts
   useEffect(() => {
     const checkAuth = async () => {
       const authStatus = await checkAuthStatus();
@@ -80,12 +80,12 @@ function App() {
     if (inputMessage.trim() !== '' && isLoggedIn) {
       console.log('Sending message:', inputMessage);
       await sendMessage(inputMessage, selectedChannelId);
-      setInputMessage('');
+      setInputMessage(''); // Clear the input after sending
       if (selectedChannelId) {
         console.log('Channel selected:', selectedChannelId);
-        fetchMessages(selectedChannelId);
+        fetchMessages(selectedChannelId); // Refresh messages for the selected channel
       } else {
-        fetchMessages();
+        fetchMessages(); // Fetch all messages if no channel is selected
       }
     }
   };
