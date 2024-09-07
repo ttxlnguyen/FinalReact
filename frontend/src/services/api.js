@@ -65,7 +65,12 @@ export const postMessage = async (messageData) => {
 
 export const getChannels = async () => {
   try {
-    const response = await axiosInstance.get('/channels');
+    const currentUser = getCurrentUser();
+    if (!currentUser ||!currentUser.username) {
+      console.log('No current user found, skipping channel fetch');
+      return null;
+    }console.log('Currenttttttttttttt' + currentUser.username);  // For testing, replace with actual API call
+    const response = await axiosInstance.get(`/channels/user-profile/${currentUser.username}`);
     return response.data;
   } catch (error) {
     handleApiError(error, 'Error fetching channels:');
