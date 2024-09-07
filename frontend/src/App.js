@@ -21,8 +21,7 @@ function App() {
     loading, 
     error, 
     selectChannel, 
-    selectedChannelId, 
-    selectedChannelType,
+    selectedChannelId,
     setSelectedChannelId, 
     sendMessage, 
     fetchMessages,
@@ -68,11 +67,11 @@ function App() {
     }
   };
 
-  const handleChannelSelect = (channelId, channelType) => {
-    selectChannel(channelId, channelType);
+  const handleChannelSelect = (channelId) => {
+    selectChannel(channelId);
     setIsChannelListOpen(false);
     if (isLoggedIn) {
-      fetchMessages(channelId, channelType);
+      fetchMessages(channelId);
     }
   };
 
@@ -93,7 +92,7 @@ function App() {
       setInputMessage('');
       if (selectedChannelId) {
         console.log('Channel selected:', selectedChannelId);
-        fetchMessages(selectedChannelId, selectedChannelType);
+        fetchMessages(selectedChannelId);
       } else if (selectedMessageId) {
         // If a message is selected, fetch the updated conversation
         const updatedMessages = await fetchMessagesByUser(messages.find(m => m.id === selectedMessageId).senderId);
