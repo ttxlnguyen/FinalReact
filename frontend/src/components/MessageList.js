@@ -21,25 +21,27 @@ function MessageList({ messages, selectedMessageId }) {
     return (
       <div className="message-conversation">
        
-        <h2>Conversation hhhh</h2>
+        <h2>Conversation</h2>
         <ul>
         {messages.map(message => (
             <li key={message.id} >
               <p>{message.content}</p>
               <small>{new Date(message.sentAt).toLocaleString()}</small>
+              <small>{message.userProfile?.username || 'Unknown User'}</small>
             </li>
           ))}
           {conversationMessages.map(message => (
             <li key={message.id} className={message.senderId === selectedMessage.senderId ? 'received' : 'sent'}>
               <p>{message.content}</p>
               <small>{new Date(message.sentAt).toLocaleString()}</small>
+              <small>{message.userProfile?.username || 'Unknown User'}</small>
             </li>
           ))}
         </ul>
       </div>
     );
-  }else {
-    // console.log(messages.ma);
+  } else {
+
     //Show message content and userProfile username
     return (
       <div className="message-list">
@@ -49,14 +51,13 @@ function MessageList({ messages, selectedMessageId }) {
             <li key={message.id} >
               <p>{message.content}</p>
               <small>{new Date(message.sentAt).toLocaleString()}</small>
-             <small>{(message.userProfile.username)} </small>
+              <small>  {message.userProfile?.username || 'Unknown User'}</small>
             </li>
           ))}
         </ul>
       </div>
     );
   }
-
   return (
     <div className="message-list">
       <h2>Select a message to view its details</h2>

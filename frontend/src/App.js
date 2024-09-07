@@ -14,17 +14,21 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const { 
     channels, 
+    publicChannels,
+    privateChannels,
     messages,
     setMessages, 
     loading, 
     error, 
     selectChannel, 
     selectedChannelId, 
+    selectedChannelType,
     setSelectedChannelId, 
     sendMessage, 
-
     fetchMessages,
-    fetchMessagesByUser
+    fetchMessagesByUser,
+    fetchPublicChannels,
+    fetchPrivateChannels
   } = useAppData(isLoggedIn);  // Pass isLoggedIn to useAppData
 
   const [isChannelListOpen, setIsChannelListOpen] = useState(false);
@@ -42,6 +46,13 @@ function App() {
     checkAuth();
   }, []);
 
+  useEffect(() => {
+    if (isLoggedIn && currentUser && currentUser.username) {
+      fetchPublicChannels(currentUser.username);
+      fetchPrivateChannels(currentUser.username);
+    }
+  }, [isLoggedIn, currentUser, fetchPublicChannels, fetchPrivateChannels]);
+
   const toggleChannelList = () => {
     setIsChannelListOpen(!isChannelListOpen);
     setIsMessagesOpen(false);
@@ -57,12 +68,11 @@ function App() {
     }
   };
 
-  const handleChannelSelect = (channelId) => {
-    selectChannel(channelId);
+  const handleChannelSelect = (channelId, channelType) => {
+    selectChannel(channelId, channelType);
     setIsChannelListOpen(false);
     if (isLoggedIn) {
-  
-      fetchMessages(channelId);
+      fetchMessages(channelId, channelType);
     }
   };
 
@@ -83,7 +93,7 @@ function App() {
       setInputMessage('');
       if (selectedChannelId) {
         console.log('Channel selected:', selectedChannelId);
-        fetchMessages(selectedChannelId);//Need to refactor this to make fetchMessagesByChannelId
+        fetchMessages(selectedChannelId, selectedChannelType);
       } else if (selectedMessageId) {
         // If a message is selected, fetch the updated conversation
         const updatedMessages = await fetchMessagesByUser(messages.find(m => m.id === selectedMessageId).senderId);
@@ -119,7 +129,6 @@ function App() {
     return <div>Error: {error}</div>;
   }
  
-
   return (
     <div className="App">
       <Sidebar
@@ -129,14 +138,23 @@ function App() {
         user={currentUser}
       />
 
-      {isChannelListOpen && <Channels channels={channels} handleChannelSelect={handleChannelSelect} />}
+      {isChannelListOpen && (
+        <Channels 
+          channels={channels}
+          publicChannels={publicChannels}
+          privateChannels={privateChannels}
+          handleChannelSelect={handleChannelSelect}
+        />
+      )}
       {isMessagesOpen && <Messages messages={messages} onSelectMessage={handleMessageSelect} />}
 
       <div className="main-content">
         <header className="main-header">
           <h1>
             {selectedChannelId 
-              ? `# ${channels.find(c => c.id === selectedChannelId)?.name}`
+              ? `# ${channels.find(c => c.id === selectedChannelId)?.name || 
+                   publicChannels.find(c => c.id === selectedChannelId)?.name || 
+                   privateChannels.find(c => c.id === selectedChannelId)?.name}`
               : 'All Messages'
             }
           </h1>
@@ -157,12 +175,3 @@ function App() {
 }
 
 export default App;
-
-/**
- * Changes made to address login state update issues:
- * 1. Added a currentUser state to store the logged-in user's information.
- * 2. Updated the initial useEffect to use an async function for checking auth status.
- * 3. Modified handleLoginSuccess to be an async function and update both isLoggedIn and currentUser states.
- * 4. Updated handleLogout to clear both isLoggedIn and currentUser states.
- * 5. Passed currentUser to the Sidebar component instead of calling checkAuthStatus() directly.
- */

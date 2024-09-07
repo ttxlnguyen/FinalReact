@@ -1,9 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getChannels, getMessages, getMessagesByChannel, postMessage, getUserProfile } from '../services/api';
+import { getChannels, getMessages, getMessagesByChannel, postMessage, getUserProfile, getPublicChannelsByUsername, getPrivateChannelsByUsername } from '../services/api';
 import { getCurrentUser } from '../services/auth';
 
 function useAppData(isLoggedIn) {
   const [channels, setChannels] = useState([]);
+  // State for storing public channels
+  const [publicChannels, setPublicChannels] = useState([]);
+  // State for storing private channels
+  const [privateChannels, setPrivateChannels] = useState([]);
   const [messages, setMessages] = useState([]);
   const [selectedChannelId, setSelectedChannelId] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
@@ -18,6 +22,38 @@ function useAppData(isLoggedIn) {
       setChannels(channelsData);
     } catch (err) {
       setError('Failed to fetch channels: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [isLoggedIn]);
+
+  // Function to fetch public channels for a specific user
+  const fetchPublicChannels = useCallback(async (username) => {
+    if (!isLoggedIn) return;
+    try {
+      setLoading(true);
+      // Call the API function to get public channels
+      const publicChannelsData = await getPublicChannelsByUsername(username);
+      // Update the state with the fetched public channels
+      setPublicChannels(publicChannelsData);
+    } catch (err) {
+      setError('Failed to fetch public channels: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [isLoggedIn]);
+
+  // Function to fetch private channels for a specific user
+  const fetchPrivateChannels = useCallback(async (username) => {
+    if (!isLoggedIn) return;
+    try {
+      setLoading(true);
+      // Call the API function to get private channels
+      const privateChannelsData = await getPrivateChannelsByUsername(username);
+      // Update the state with the fetched private channels
+      setPrivateChannels(privateChannelsData);
+    } catch (err) {
+      setError('Failed to fetch private channels: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -58,8 +94,14 @@ function useAppData(isLoggedIn) {
       fetchChannels();
       fetchMessages();
       fetchUserProfile();
+      const currentUser = getCurrentUser();
+      if (currentUser && currentUser.username) {
+        // Fetch both public and private channels when the user is logged in
+        fetchPublicChannels(currentUser.username);
+        fetchPrivateChannels(currentUser.username);
+      }
     }
-  }, [isLoggedIn, fetchChannels, fetchMessages, fetchUserProfile]);
+  }, [isLoggedIn, fetchChannels, fetchMessages, fetchUserProfile, fetchPublicChannels, fetchPrivateChannels]);
 
   useEffect(() => {
     if (isLoggedIn && selectedChannelId) {
@@ -86,6 +128,8 @@ function useAppData(isLoggedIn) {
 
   return { 
     channels, 
+    publicChannels,
+    privateChannels,
     messages, 
     userProfile,
     loading, 
@@ -94,17 +138,10 @@ function useAppData(isLoggedIn) {
     selectedChannelId,
     setSelectedChannelId,
     sendMessage,
-    fetchMessages
+    fetchMessages,
+    fetchPublicChannels,
+    fetchPrivateChannels
   };
 }
 
 export default useAppData;
-
-/**
- * Changes made to address authentication issues:
- * 1. Added isLoggedIn as a parameter to useAppData.
- * 2. Added isLoggedIn checks before performing any API calls.
- * 3. Removed the isAuthenticated import and rely on the isLoggedIn prop.
- * 4. Updated the fetchUserProfile function to use the getUserProfile from api.js.
- * 5. Set initial loading state to false to prevent unnecessary loading indicators.
- */
