@@ -6,10 +6,6 @@ function useAppData(isLoggedIn) {
   const [publicChannels, setPublicChannels] = useState([]);
   const [privateChannels, setPrivateChannels] = useState([]);
   const [channels, setChannels] = useState([]);
-  // State for storing public channels
-  const [publicChannels, setPublicChannels] = useState([]);
-  // State for storing private channels
-  const [privateChannels, setPrivateChannels] = useState([]);
   const [messages, setMessages] = useState([]);
   const [selectedChannelId, setSelectedChannelId] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
