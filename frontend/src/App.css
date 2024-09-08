@@ -87,6 +87,10 @@ body {
   margin-left: 10px;
 }
 
+.message-list p {
+  margin: 0;
+}
+
 .message-list ul {
   padding: 0;
 }
