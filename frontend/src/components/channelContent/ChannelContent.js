@@ -14,7 +14,9 @@ function ChannelContent({ messages, selectedChannelId }) {
         <ul>
           {filteredMessages.map(message => (
             <p key={message.id}>
-              <h4>{message.userProfile?.username + ": " + new Date(message.sentAt).toLocaleString()|| 'Unknown User'}</h4>
+              <h4>{message.userProfile?.username + ": " || 'Unknown User: '}
+                <span className="timestamp">{new Date(message.sentAt).toLocaleString()}</span>
+              </h4>
               <small>{message.content}</small>
             </p>
           ))}
@@ -29,7 +31,9 @@ function ChannelContent({ messages, selectedChannelId }) {
         <ul>
         {messages.map(message => (
             <p key={message.id} >
-              <h4>{message.userProfile?.username + ": " + new Date(message.sentAt).toLocaleString()|| 'Unknown User: '}</h4>
+              <h4>{message.userProfile?.username + ": " || 'Unknown User: '}
+                <span className="timestamp">{new Date(message.sentAt).toLocaleString()}</span>
+              </h4>
               <small>{message.content}</small>
             </p>
           ))}

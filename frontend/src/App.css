@@ -88,5 +88,14 @@ body {
 }
 
 .message-list ul {
-  padding: 0;
+  padding: 5;
+}
+
+.message-list h4 {
+  margin-bottom: 0;
+}
+
+.timestamp {
+  font-size: 0.8em;
+  color: #6b6b6b;
 }
