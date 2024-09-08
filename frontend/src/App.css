@@ -25,20 +25,20 @@ body {
   margin: 20px auto;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 0 10px #0000001a;
+  box-shadow: 0 0 10px #ffffff8c;
 }
 
 /* Main content area styles */
 .main-content {
   flex-grow: 1;
-  background-color: #060745bc;
+  background-color: #140b9c1e;
   display: flex;
   flex-direction: column;
 }
 
 .main-header {
   padding: 20px;
-  border-bottom: 1px solid #0c0fbb;
+  border-bottom: 1px solid #0b0eda;
   background-color: #080967bc;
 }
 
@@ -81,14 +81,18 @@ body {
   margin-right: 5px;
 }
 
-.message .timestamp {
+.message {
   font-size: 12px;
   color: #d1d1d1;
   margin-left: 10px;
 }
 
 .message-list ul {
-  padding: 5;
+  padding: 0;
+}
+
+.message-list h2{
+  margin: 0;
 }
 
 .message-list h4 {
