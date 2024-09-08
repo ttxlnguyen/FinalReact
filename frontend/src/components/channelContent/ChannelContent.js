@@ -14,7 +14,7 @@ function ChannelContent({ messages, selectedChannelId }) {
         <ul>
           {filteredMessages.map(message => (
             <p key={message.id}>
-              <h4>{message.userProfile?.username + ": " + new Date(message.sentAt).toLocaleString() || 'Unknown User'}</h4>
+              <h4>{message.userProfile?.username + ": " + new Date(message.sentAt).toLocaleString()|| 'Unknown User'}</h4>
               <small>{message.content}</small>
             </p>
           ))}

@@ -86,3 +86,7 @@ body {
   color: #d1d1d1;
   margin-left: 10px;
 }
+
+.message-list ul {
+  padding: 0;
+}
