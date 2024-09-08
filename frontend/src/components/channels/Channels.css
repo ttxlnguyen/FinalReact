@@ -23,7 +23,7 @@
 .channel-list li, .notifications-list li {
   padding: 8px 0;
   cursor: pointer;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid #4346f783;
 }
 
 .channel-list li:hover, .notifications-list li:hover {
