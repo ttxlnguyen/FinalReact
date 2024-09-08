@@ -4,7 +4,7 @@ function ChannelContent({ messages, selectedChannelId }) {
   const filteredMessages = messages.filter(message => !message.isDeleted);
 
   if (filteredMessages.length === 0) {
-    return <div>No messages to display.</div>;
+    return <div className="message-list">No messages to display.</div>;
   }
 
   if (selectedChannelId) {
@@ -13,11 +13,12 @@ function ChannelContent({ messages, selectedChannelId }) {
         <h2>Messages</h2>
         <ul>
           {filteredMessages.map(message => (
-            <li key={message.id}>
-              <p>{message.content}</p>
-              <small>{new Date(message.sentAt).toLocaleString()}</small>
-              <small>{message.userProfile?.username || 'Unknown User'}</small>
-            </li>
+            <p key={message.id}>
+              <h4>{message.userProfile?.username + ": " || 'Unknown User: '}
+                <span className="timestamp">{new Date(message.sentAt).toLocaleString()}</span>
+              </h4>
+              <small>{message.content}</small>
+            </p>
           ))}
         </ul>
       </div>
@@ -29,11 +30,12 @@ function ChannelContent({ messages, selectedChannelId }) {
         <h2>Messages</h2>
         <ul>
         {messages.map(message => (
-            <li key={message.id} >
-              <p>{message.content}</p>
-              <small>{new Date(message.sentAt).toLocaleString()}</small>
-              <small>  {message.userProfile?.username || 'Unknown User'}</small>
-            </li>
+            <p key={message.id} >
+              <h4>{message.userProfile?.username + ": " || 'Unknown User: '}
+                <span className="timestamp">{new Date(message.sentAt).toLocaleString()}</span>
+              </h4>
+              <small>{message.content}</small>
+            </p>
           ))}
         </ul>
       </div>
