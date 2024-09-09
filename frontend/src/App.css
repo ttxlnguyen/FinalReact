@@ -117,3 +117,8 @@ body {
 .message-list p h4 {
   margin: 2px;
 }
+
+.message-list p small {
+  font-size: 1.5rem;
+  color: #fff500;
+}
