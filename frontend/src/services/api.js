@@ -140,17 +140,14 @@ export const getPrivateChannelsByUsername = async (username) => {
   }
 };
 
-// Check if a user exists and get their ID
-export const checkUserExistsAndGetId = async (username) => {
+// Check if a user exists
+export const checkUserExists = async (username) => {
   try {
     const response = await axiosInstance.get(`/user-profiles/username/${username}`);
-    if (response.status === 200) {
-      return response.data.id;
-    }
-    return null;
+    return response.status === 200;
   } catch (error) {
     if (error.response && error.response.status === 404) {
-      return null;
+      return false;
     }
     handleApiError(error, `Error checking if user ${username} exists:`);
   }
@@ -161,20 +158,16 @@ export const createPrivateChannel = async (username, invitedUsername) => {
   try {
     console.log(`Creating private channel: ${username} inviting ${invitedUsername}`);
     
-    // First, check if both users exist and get their IDs
-    const creatorId = await checkUserExistsAndGetId(username);
-    const invitedId = await checkUserExistsAndGetId(invitedUsername);
-
-    if (!creatorId || !invitedId) {
-      throw new Error(`One or both users do not exist. Creator: ${username}, Invited: ${invitedUsername}`);
+    // First, check if the invited user exists
+    const userExists = await checkUserExists(invitedUsername);
+    if (!userExists) {
+      throw new Error(`Invited user ${invitedUsername} does not exist.`);
     }
 
-    // If both users exist, proceed with creating the channel
+    // If the invited user exists, proceed with creating the channel
     const channelData = {
       name: invitedUsername,
-      privacy: true,
-      creatorId: creatorId,
-      invitedId: invitedId
+      privacy: true
     };
     console.log('Sending channel creation request:', channelData);
 
@@ -233,5 +226,5 @@ export default {
   getPrivateChannelsByUsername,
   createPrivateChannel,
   createPublicChannel,
-  checkUserExistsAndGetId,
+  checkUserExists,
 };
