@@ -61,6 +61,7 @@ body {
   display: flex;
   flex-direction: column;
   color: #d1d1d1;
+  font-size: 1.5rem;
 }
 
 .message-conversation {
@@ -88,6 +89,12 @@ body {
 
 .message-list p {
   margin: 0;
+  background-color: #090955;
+  margin: 5px;
+  width: 80%;
+  border-radius: 15px;
+  border: 1px solid;
+  padding: 5px 10px;
 }
 
 .message-list ul {
@@ -105,4 +112,8 @@ body {
 .timestamp {
   font-size: 0.8em;
   color: #6b6b6b;
+}
+
+.message-list p h4 {
+  margin: 2px;
 }

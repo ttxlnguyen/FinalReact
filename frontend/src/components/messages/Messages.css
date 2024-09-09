@@ -4,6 +4,7 @@
   color: #ffffff;
   padding: 20px;
   overflow-y: auto;
+  font-size: 1.75rem;
 }
 
 .messages-list h2 {
@@ -22,7 +23,7 @@
   padding: 8px 0;
   cursor: pointer;
   border-bottom: 1px solid #4346f783;
-  font-size: 14px;
+  font-size: 1.5rem;
 }
 
 .messages-list li:hover {
