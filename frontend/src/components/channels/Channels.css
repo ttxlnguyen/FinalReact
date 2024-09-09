@@ -5,6 +5,7 @@
   color: #ffffff;
   padding: 20px;
   overflow-y: auto;
+  font-size: 1.75rem;
 }
 
 .channel-list h2, .notifications-list h2 {
@@ -24,6 +25,7 @@
   padding: 8px 0;
   cursor: pointer;
   border-bottom: 1px solid #4346f783;
+  font-size: 1.5rem;
 }
 
 .channel-list li:hover, .notifications-list li:hover {
