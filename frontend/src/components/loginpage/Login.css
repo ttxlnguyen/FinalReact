@@ -16,6 +16,11 @@
   padding: 20px;
 }
 
+.login-table h2 {
+  margin: 0px;
+  padding-bottom: 10px;
+}
+
 .login-table td {
   padding: 10px;
 }
