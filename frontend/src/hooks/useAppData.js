@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getChannels, getMessages, getMessagesByChannel, postMessage, getUserProfile, getPublicChannelsByUsername, getPrivateChannelsByUsername, createPrivateChannel, createPublicChannel, checkUserExistsAndGetId } from '../services/api';
+import { getChannels, getMessages, getMessagesByChannel, postMessage, getUserProfile, getPublicChannels, getPrivateChannelsByUsername, createPrivateChannel, createPublicChannel, checkUserExistsAndGetId } from '../services/api';
 import { getCurrentUser } from '../services/auth';
 
 // Custom hook to manage the application's data
@@ -28,12 +28,12 @@ function useAppData(isLoggedIn) {
     }
   }, [isLoggedIn]);
 
-  // Fetch public channels for a specific user
-  const fetchPublicChannels = useCallback(async (username) => {
+  // Fetch all public channels
+  const fetchPublicChannels = useCallback(async () => {
     if (!isLoggedIn) return;
     try {
       setLoading(true);
-      const publicChannelsData = await getPublicChannelsByUsername(username);
+      const publicChannelsData = await getPublicChannels();
       setPublicChannels(publicChannelsData);
     } catch (err) {
       setError('Failed to fetch public channels: ' + err.message);
@@ -148,15 +148,14 @@ function useAppData(isLoggedIn) {
   useEffect(() => {
     if (isLoggedIn) {
       fetchChannels();
-      // fetchMessages(); // Commented out, might be unnecessary
+      fetchPublicChannels();
       fetchUserProfile();
       const currentUser = getCurrentUser();
       if (currentUser && currentUser.username) {
-        fetchPublicChannels(currentUser.username);
         fetchPrivateChannels(currentUser.username);
       }
     }
-  }, [isLoggedIn, fetchChannels, fetchUserProfile, fetchPublicChannels, fetchPrivateChannels]);
+  }, [isLoggedIn, fetchChannels, fetchPublicChannels, fetchUserProfile, fetchPrivateChannels]);
 
   // Effect to fetch messages when a channel is selected
   useEffect(() => {

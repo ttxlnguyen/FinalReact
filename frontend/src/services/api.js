@@ -110,6 +110,16 @@ export const getUserProfile = async () => {
   }
 };
 
+// Fetch all public channels
+export const getPublicChannels = async () => {
+  try {
+    const response = await axiosInstance.get('/channels/public');
+    return response.data;
+  } catch (error) {
+    handleApiError(error, 'Error fetching public channels:');
+  }
+};
+
 // Fetch public channels for a specific user
 export const getPublicChannelsByUsername = async (username) => { 
   try {
@@ -201,7 +211,7 @@ export const createPublicChannel = async (username, channelName) => {
     console.log('Create Public Channel Response:', response.data);
 
     // Fetch updated public channels
-    const updatedPublicChannels = await getPublicChannelsByUsername(username);
+    const updatedPublicChannels = await getPublicChannels();
     console.log(`Updated public channels:`, updatedPublicChannels);
 
     return response.data;
@@ -218,6 +228,7 @@ export default {
   getChannels,
   getChannel,
   getUserProfile,
+  getPublicChannels,
   getPublicChannelsByUsername,
   getPrivateChannelsByUsername,
   createPrivateChannel,
