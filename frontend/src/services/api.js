@@ -171,7 +171,7 @@ export const createPrivateChannel = async (username, invitedUsername) => {
     };
     console.log('Sending channel creation request:', channelData);
 
-    const response = await axiosInstance.post(`/channels/username/${username}`, channelData);
+    const response = await axiosInstance.post(`/channels/username/${invitedUsername}`, channelData);
     
     console.log('Create Private Channel Response:', response.data);
 
