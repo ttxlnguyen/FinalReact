@@ -53,7 +53,8 @@ const App = ({
   handleInputChange,
   handleMessageSubmit,
   handleLoginSuccess,
-  handleLogout
+  handleLogout,
+  createNewPrivateChannel
 }) => {
   if (!isLoggedIn) {
     return <Login onLoginSuccess={handleLoginSuccess} />;
@@ -87,6 +88,7 @@ const App = ({
         <Messages 
           privateChannels={privateChannels}
           handleChannelSelect={handleChannelSelect}
+          createNewPrivateChannel={createNewPrivateChannel}
         />
       )}
 

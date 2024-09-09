@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getChannels, getMessages, getMessagesByChannel, postMessage, getUserProfile, getPublicChannelsByUsername, getPrivateChannelsByUsername } from '../services/api';
+import { getChannels, getMessages, getMessagesByChannel, postMessage, getUserProfile, getPublicChannelsByUsername, getPrivateChannelsByUsername, createPrivateChannel, checkUserExistsAndGetId } from '../services/api';
 import { getCurrentUser } from '../services/auth';
 
 // Custom hook to manage the application's data
@@ -88,6 +88,40 @@ function useAppData(isLoggedIn) {
     }
   }, [isLoggedIn]);
 
+  // Create a new private channel
+  const createNewPrivateChannel = useCallback(async (invitedUsername) => {
+    if (!isLoggedIn) return;
+    try {
+      setLoading(true);
+      const currentUser = getCurrentUser();
+      if (!currentUser || !currentUser.username) {
+        throw new Error('No current user found');
+      }
+
+      // Check if the invited user exists and get their ID
+      const invitedUserId = await checkUserExistsAndGetId(invitedUsername);
+      if (!invitedUserId) {
+        throw new Error(`User ${invitedUsername} does not exist.`);
+      }
+
+      const newChannel = await createPrivateChannel(currentUser.username, invitedUsername);
+      
+      // Set the channel name to be the invited user's username
+      const channelWithName = {
+        ...newChannel,
+        name: invitedUsername
+      };
+      
+      setPrivateChannels(prevChannels => [...prevChannels, channelWithName]);
+      return channelWithName;
+    } catch (err) {
+      setError('Failed to create private channel: ' + err.message);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, [isLoggedIn]);
+
   // Effect to fetch initial data when user logs in
   useEffect(() => {
     if (isLoggedIn) {
@@ -145,7 +179,8 @@ function useAppData(isLoggedIn) {
     sendMessage,
     fetchMessages,
     fetchPublicChannels,
-    fetchPrivateChannels
+    fetchPrivateChannels,
+    createNewPrivateChannel
   };
 }
 

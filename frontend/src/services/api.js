@@ -130,6 +130,61 @@ export const getPrivateChannelsByUsername = async (username) => {
   }
 };
 
+// Check if a user exists and get their ID
+export const checkUserExistsAndGetId = async (username) => {
+  try {
+    const response = await axiosInstance.get(`/user-profiles/username/${username}`);
+    if (response.status === 200) {
+      return response.data.id;
+    }
+    return null;
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      return null;
+    }
+    handleApiError(error, `Error checking if user ${username} exists:`);
+  }
+};
+
+// Create a new private channel and invite another user
+export const createPrivateChannel = async (username, invitedUsername) => {
+  try {
+    console.log(`Creating private channel: ${username} inviting ${invitedUsername}`);
+    
+    // First, check if both users exist and get their IDs
+    const creatorId = await checkUserExistsAndGetId(username);
+    const invitedId = await checkUserExistsAndGetId(invitedUsername);
+
+    if (!creatorId || !invitedId) {
+      throw new Error(`One or both users do not exist. Creator: ${username}, Invited: ${invitedUsername}`);
+    }
+
+    // If both users exist, proceed with creating the channel
+    const channelData = {
+      name: invitedUsername,
+      privacy: true,
+      creatorId: creatorId,
+      invitedId: invitedId
+    };
+    console.log('Sending channel creation request:', channelData);
+
+    const response = await axiosInstance.post(`/channels/username/${username}`, channelData);
+    
+    console.log('Create Private Channel Response:', response.data);
+
+    // Fetch updated private channels for both users
+    const creatorChannels = await getPrivateChannelsByUsername(username);
+    const invitedChannels = await getPrivateChannelsByUsername(invitedUsername);
+
+    console.log(`Updated channels for ${username}:`, creatorChannels);
+    console.log(`Updated channels for ${invitedUsername}:`, invitedChannels);
+
+    return response.data;
+  } catch (error) {
+    handleApiError(error, `Error creating private channel for user ${username}:`);
+  }
+};
+
 // Export all functions as a default object
 export default {
   getMessages,
@@ -140,4 +195,6 @@ export default {
   getUserProfile,
   getPublicChannelsByUsername,
   getPrivateChannelsByUsername,
+  createPrivateChannel,
+  checkUserExistsAndGetId,
 };
