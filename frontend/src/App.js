@@ -64,8 +64,8 @@ function App() {
   // Handle channel selection
   const handleChannelSelect = (channelId) => {
     selectChannel(channelId);
-    setIsChannelListOpen(false);
-    setIsMessagesOpen(false);
+    // Removed: setIsChannelListOpen(false);
+    setIsMessagesOpen(true);
     if (isLoggedIn) {
       fetchMessages(channelId);
     }
