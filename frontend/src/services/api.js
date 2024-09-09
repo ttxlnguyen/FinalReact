@@ -185,6 +185,31 @@ export const createPrivateChannel = async (username, invitedUsername) => {
   }
 };
 
+// Create a new public channel
+export const createPublicChannel = async (username, channelName) => {
+  try {
+    console.log(`Creating public channel: ${channelName} by user ${username}`);
+
+    const channelData = {
+      name: channelName,
+      privacy: false
+    };
+    console.log('Sending public channel creation request:', channelData);
+
+    const response = await axiosInstance.post(`/channels/username/public`, channelData);
+    
+    console.log('Create Public Channel Response:', response.data);
+
+    // Fetch updated public channels
+    const updatedPublicChannels = await getPublicChannelsByUsername(username);
+    console.log(`Updated public channels:`, updatedPublicChannels);
+
+    return response.data;
+  } catch (error) {
+    handleApiError(error, `Error creating public channel ${channelName} for user ${username}:`);
+  }
+};
+
 // Export all functions as a default object
 export default {
   getMessages,
@@ -196,5 +221,6 @@ export default {
   getPublicChannelsByUsername,
   getPrivateChannelsByUsername,
   createPrivateChannel,
+  createPublicChannel,
   checkUserExistsAndGetId,
 };

@@ -26,7 +26,8 @@ function App() {
     fetchMessages,
     fetchPublicChannels,
     fetchPrivateChannels,
-    createNewPrivateChannel
+    createNewPrivateChannel,
+    createNewPublicChannel
   } = useAppData(isLoggedIn);
 
   // Check authentication status when the component mounts
@@ -116,6 +117,16 @@ function App() {
     }
   };
 
+  // Handle creating a new public channel
+  const handleCreatePublicChannel = async (channelName) => {
+    if (isLoggedIn && currentUser) {
+      const newChannel = await createNewPublicChannel(channelName);
+      if (newChannel) {
+        handleChannelSelect(newChannel.id);
+      }
+    }
+  };
+
   // Render the JSX component with all necessary props
   return (
     <AppJSX
@@ -138,6 +149,7 @@ function App() {
       handleLoginSuccess={handleLoginSuccess}
       handleLogout={handleLogout}
       createNewPrivateChannel={handleCreatePrivateChannel}
+      createNewPublicChannel={handleCreatePublicChannel}
     />
   );
 }
