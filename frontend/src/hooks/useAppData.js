@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getChannels, getMessages, getMessagesByChannel, postMessage, getUserProfile, getPublicChannels, getPrivateChannelsByUsername, createPrivateChannel, createPublicChannel, checkUserExistsAndGetId } from '../services/api';
+import { getChannels, getMessages, getMessagesByChannel, postMessage, getUserProfile, getPublicChannels, getPrivateChannelsByUsername, createPrivateChannel, createPublicChannel, checkUserExists } from '../services/api';
 import { getCurrentUser } from '../services/auth';
 
 // Custom hook to manage the application's data
@@ -98,9 +98,9 @@ function useAppData(isLoggedIn) {
         throw new Error('No current user found');
       }
 
-      // Check if the invited user exists and get their ID
-      const invitedUserId = await checkUserExistsAndGetId(invitedUsername);
-      if (!invitedUserId) {
+      // Check if the invited user exists
+      const userExists = await checkUserExists(invitedUsername);
+      if (!userExists) {
         throw new Error(`User ${invitedUsername} does not exist.`);
       }
 
