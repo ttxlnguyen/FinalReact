@@ -21,8 +21,7 @@ body {
 .App {
   display: flex;
   height: calc(100vh - 40px);
-  max-width: 95%;
-  margin: 20px auto;
+  margin: 20px;
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 0 10px #ffffff8c;
