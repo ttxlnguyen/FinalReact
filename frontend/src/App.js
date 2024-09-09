@@ -64,8 +64,8 @@ function App() {
   // Handle channel selection
   const handleChannelSelect = (channelId) => {
     selectChannel(channelId);
-    // Removed: setIsChannelListOpen(false);
-    setIsMessagesOpen(true);
+    // UN-comment to restor sidebar colapse: setIsChannelListOpen(false);
+    // UN-comment to restor sidebar colapse: setIsMessagesOpen(true);
     if (isLoggedIn) {
       fetchMessages(channelId);
     }
