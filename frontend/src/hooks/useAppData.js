@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getChannels, getMessages, getMessagesByChannel, postMessage, getUserProfile, getPublicChannelsByUsername, getPrivateChannelsByUsername, createPrivateChannel, checkUserExistsAndGetId } from '../services/api';
+import { getChannels, getMessages, getMessagesByChannel, postMessage, getUserProfile, getPublicChannelsByUsername, getPrivateChannelsByUsername, createPrivateChannel, createPublicChannel, checkUserExistsAndGetId } from '../services/api';
 import { getCurrentUser } from '../services/auth';
 
 // Custom hook to manage the application's data
@@ -122,6 +122,28 @@ function useAppData(isLoggedIn) {
     }
   }, [isLoggedIn]);
 
+  // Create a new public channel
+  const createNewPublicChannel = useCallback(async (channelName) => {
+    if (!isLoggedIn) return;
+    try {
+      setLoading(true);
+      const currentUser = getCurrentUser();
+      if (!currentUser || !currentUser.username) {
+        throw new Error('No current user found');
+      }
+
+      const newChannel = await createPublicChannel(currentUser.username, channelName);
+      
+      setPublicChannels(prevChannels => [...prevChannels, newChannel]);
+      return newChannel;
+    } catch (err) {
+      setError('Failed to create public channel: ' + err.message);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, [isLoggedIn]);
+
   // Effect to fetch initial data when user logs in
   useEffect(() => {
     if (isLoggedIn) {
@@ -180,7 +202,8 @@ function useAppData(isLoggedIn) {
     fetchMessages,
     fetchPublicChannels,
     fetchPrivateChannels,
-    createNewPrivateChannel
+    createNewPrivateChannel,
+    createNewPublicChannel
   };
 }
 
