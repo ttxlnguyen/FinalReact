@@ -1,38 +1,124 @@
+/* Global styles */
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background-image: url('https://upload.wikimedia.org/wikipedia/commons/3/30/GIF_Gears.gif'); /* URL to your background image */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  background-color: #000000;
+}
+
+/* Main app container */
 .App {
-  text-align: center;
+  display: flex;
+  height: calc(100vh - 40px);
+  margin: 20px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 10px #ffffff8c;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* Main content area styles */
+.main-content {
+  flex-grow: 1;
+  background-color: #140b9c1e;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.main-header {
+  padding: 20px;
+  border-bottom: 1px solid #0b0eda;
+  background-color: #080967bc;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.main-header h1 {
+  font-size: 18px;
+  margin: 0 0 5px 0;
+  color:#d1d1d1;
+}
+
+.main-header p {
+  font-size: 13px;
+  color: #616061;
+  margin: 0;
+}
+
+/* Message list styles */
+.message-list {
+  flex-grow: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  color: #d1d1d1;
+  font-size: 1.5rem;
+}
+
+.message-conversation {
+  color: #d1d1d1;
+}
+
+.message {
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #d1d1d1;
+  border-radius: 5px;
+  max-width: 80%;
+}
+
+.message strong {
+  font-weight: 600;
+  margin-right: 5px;
+}
+
+.message {
+  font-size: 12px;
+  color: #d1d1d1;
+  margin-left: 10px;
+}
+
+.message-list p {
+  margin: 0;
+  background-color: #090955;
+  margin: 5px;
+  width: 80%;
+  border-radius: 15px;
+  border: 1px solid;
+  padding: 5px 10px;
+}
+
+.message-list ul {
+  padding: 0;
+}
+
+.message-list h2{
+  margin: 0;
+}
+
+.message-list h4 {
+  margin-bottom: 0;
+}
+
+.timestamp {
+  font-size: 0.8em;
+  color: #6b6b6b;
+}
+
+.message-list p h4 {
+  margin: 2px;
+}
+
+.message-list p small {
+  font-size: 1.5rem;
+  color: #fff500;
 }

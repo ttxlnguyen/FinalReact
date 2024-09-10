@@ -1,0 +1,33 @@
+.user-profile-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #33108c;
+  border: 1px solid #d1d1d1;
+  border-radius: 8px;
+  padding: 20px;
+  width: 300px;
+}
+
+.user-profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #d1d1d1;
+}
+
+.user-profile-close-button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.user-profile-info {
+  color: #d1d1d1;
+}
+
+.user-profile-info p {
+  margin: 5px 0;
+}
