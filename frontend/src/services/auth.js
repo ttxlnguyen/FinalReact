@@ -12,15 +12,18 @@ const API_BASE_URL = 'http://localhost:8080/api';
  */
 export const login = async (username, password) => {
   try {
+    // Convert username to lowercase for case-insensitive login
+    const lowercaseUsername = username.toLowerCase();
+
     // Send a POST request to the authentication endpoint
-    const authResponse = await axios.post(`${API_BASE_URL}/authenticate`, { username, password });
+    const authResponse = await axios.post(`${API_BASE_URL}/authenticate`, { username: lowercaseUsername, password });
     const token = authResponse.data.id_token;
 
     // Store the token in local storage
     localStorage.setItem('jhi-authenticationToken', token);
 
     // Fetch the user's profile using the token
-    const userProfileResponse = await axios.get(`${API_BASE_URL}/user-profiles/username/${username}`, {
+    const userProfileResponse = await axios.get(`${API_BASE_URL}/user-profiles/username/${lowercaseUsername}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -46,11 +49,14 @@ export const login = async (username, password) => {
  */
 export const register = async (username, email, password) => {
   try {
+    // Convert username to lowercase for consistency
+    const lowercaseUsername = username.toLowerCase();
+
     // Register the user with JHipster's User entity
-    await axios.post(`${API_BASE_URL}/register`, { login: username, email, password });
+    await axios.post(`${API_BASE_URL}/register`, { login: lowercaseUsername, email, password });
 
     // After successful registration, log in to get the token
-    const authResponse = await axios.post(`${API_BASE_URL}/authenticate`, { username, password });
+    const authResponse = await axios.post(`${API_BASE_URL}/authenticate`, { username: lowercaseUsername, password });
     const token = authResponse.data.id_token;
 
     // Store the token in local storage
@@ -58,7 +64,7 @@ export const register = async (username, email, password) => {
 
     // Create a UserProfile
     const userProfileResponse = await axios.post(`${API_BASE_URL}/user-profiles`, 
-      { username, email, password },
+      { username: lowercaseUsername, email, password },
       {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -77,7 +83,7 @@ export const register = async (username, email, password) => {
     // If the error is due to the user already existing, try to log in
     if (error.response && error.response.status === 400 && error.response.data.title === 'Login name already used!') {
       try {
-        const { token, userProfile } = await login(username, password);
+        const { token, userProfile } = await login(lowercaseUsername, password);
         return { token, userProfile };
       } catch (loginError) {
         console.error('Login after registration failed:', loginError.response ? loginError.response.data : loginError.message);
