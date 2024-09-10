@@ -36,7 +36,6 @@ function Messages({ privateChannels, handleChannelSelect, createNewPrivateChanne
       </h2>
       <h3>Private Messages</h3>
       <ul>
-         {/* Map through privateChannels array and create a list item for each channel */}
         {privateChannels.map(channel => (
           <li key={channel.id} onClick={() => handleChannelSelect(channel.id, 'private')}>
             @ {channel.name} 
@@ -57,11 +56,13 @@ function Messages({ privateChannels, handleChannelSelect, createNewPrivateChanne
                 placeholder="Enter username to invite"
                 required
               />
-              <button type="submit">Create</button>
-              <button type="button" onClick={() => {
-                setIsModalOpen(false);
-                setError(null);
-              }}>Cancel</button>
+              <div className="button-container">
+                <button type="submit">Create</button>
+                <button type="button" onClick={() => {
+                  setIsModalOpen(false);
+                  setError(null);
+                }}>Cancel</button>
+              </div>
             </form>
           </div>
         </div>
