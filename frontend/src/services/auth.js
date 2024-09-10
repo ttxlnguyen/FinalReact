@@ -20,12 +20,20 @@ export const login = async (username, password) => {
     localStorage.setItem('jhi-authenticationToken', token);
 
     // Fetch the user's profile using the token
-    const userProfileResponse = await axios.get(`${API_BASE_URL}/user-profiles/username/${username}`, {
+    const userProfileResponse = await axios.get(`${API_BASE_URL}/user-profiles`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
     });
-    const userProfile = userProfileResponse.data;
+    
+    // Find the user profile that matches the username (case-insensitive)
+    const userProfile = userProfileResponse.data.find(profile => 
+      profile.username.toLowerCase() === username.toLowerCase()
+    );
+
+    if (!userProfile) {
+      throw new Error('User profile not found');
+    }
 
     // Store the user profile in local storage
     localStorage.setItem('currentUser', JSON.stringify(userProfile));
