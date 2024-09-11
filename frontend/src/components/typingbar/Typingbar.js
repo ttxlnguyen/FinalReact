@@ -29,7 +29,7 @@ function Typingbar({ inputMessage, handleInputChange, handleMessageSubmit }) {
           placeholder="Type your message here..."
           className="message-input"
         />
-        <button type="submit" className="send-button">Send</button> // Added class for styling
+        <button type="submit" className="send-button">Send</button>
       </form>
     </div>
   );
