@@ -51,8 +51,10 @@ function Channels({ publicChannels, handleChannelSelect, createNewPublicChannel 
                 placeholder="Enter channel name"
                 required
               />
-              <button type="submit">Create</button>
-              <button type="button" onClick={() => setIsModalOpen(false)}>Cancel</button>
+              <div className="button-container">
+                <button type="submit">Create</button>
+                <button type="button" onClick={() => setIsModalOpen(false)}>Cancel</button>
+              </div>
             </form>
           </div>
         </div>
