@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { getChannels, getMessages, getMessagesByChannel, postMessage, getUserProfile, getPublicChannels, getPrivateChannelsByUsername, createPrivateChannel, createPublicChannel, checkUserExists } from '../services/api';
 import { getCurrentUser } from '../services/auth';
 
@@ -13,6 +13,10 @@ function useAppData(isLoggedIn) {
   const [userProfile, setUserProfile] = useState(null); // User profile information
   const [loading, setLoading] = useState(false); // Loading state for async operations
   const [error, setError] = useState(null); // Error state for async operations
+
+  // Refs
+  const timer = useRef(null);
+  const currentMessages = useRef([]);
 
   // Fetch all channels (might be unused)
   const fetchChannels = useCallback(async () => {
@@ -58,22 +62,21 @@ function useAppData(isLoggedIn) {
 
   // Fetch messages for a specific channel or all messages
   const fetchMessages = useCallback(async (channelId = null) => {
-    console.log('Fetching messages from ' + channelId);
     if (!isLoggedIn) return;
     try {
-      setLoading(true);
       let messagesData;
       if (channelId) {
         messagesData = await getMessagesByChannel(channelId);
       } else {
         messagesData = await getMessages();
       }
+      
+      // Update messages regardless of the number of messages
+      currentMessages.current = messagesData;
       setMessages(messagesData);
       setError(null);
     } catch (err) {
       setError('Failed to fetch messages: ' + err.message);
-    } finally {
-      setLoading(false);
     }
   }, [isLoggedIn]);
 
@@ -144,6 +147,31 @@ function useAppData(isLoggedIn) {
     }
   }, [isLoggedIn]);
 
+  // Function to select a channel
+  const selectChannel = (channelId) => {
+    setSelectedChannelId(channelId);
+  };
+
+  // Function to send a message
+  const sendMessage = async (content, channelId = null) => {
+    if (!isLoggedIn) return;
+    try {
+      const actualChannelId = channelId || selectedChannelId;
+      if (!actualChannelId) {
+        throw new Error('No channel selected');
+      }
+      const newMessage = await postMessage({ content, channelId: actualChannelId });
+      
+      // Update messages immediately for the sender
+      setMessages(prevMessages => [...prevMessages, newMessage]);
+      
+      // Also update currentMessages ref
+      currentMessages.current = [...currentMessages.current, newMessage];
+    } catch (err) {
+      setError('Failed to send message: ' + err.message);
+    }
+  };
+
   // Effect to fetch initial data when user logs in
   useEffect(() => {
     if (isLoggedIn) {
@@ -157,33 +185,24 @@ function useAppData(isLoggedIn) {
     }
   }, [isLoggedIn, fetchChannels, fetchPublicChannels, fetchUserProfile, fetchPrivateChannels]);
 
-  // Effect to fetch messages when a channel is selected
+  // Effect to start polling when a channel is selected
   useEffect(() => {
     if (isLoggedIn && selectedChannelId) {
+      // Initial fetch
       fetchMessages(selectedChannelId);
+
+      // Start polling
+      timer.current = setInterval(() => fetchMessages(selectedChannelId), 1000);
+
+      // Cleanup function to clear the interval when the component unmounts or selectedChannelId changes
+      return () => {
+        if (timer.current) {
+          clearInterval(timer.current);
+          timer.current = null;
+        }
+      };
     }
   }, [isLoggedIn, selectedChannelId, fetchMessages]);
-
-  // Function to select a channel
-  const selectChannel = (channelId) => {
-    setSelectedChannelId(channelId);
-  };
-
-  // Function to send a message
-  const sendMessage = async (content, channelId = null) => {
-    if (!isLoggedIn) return;
-    console.log(channelId);
-    try {
-      const actualChannelId = channelId || selectedChannelId;
-      if (!actualChannelId) {
-        throw new Error('No channel selected');
-      }
-      const newMessage = await postMessage({ content, channelId: actualChannelId });
-      setMessages(prevMessages => [...prevMessages, newMessage]);
-    } catch (err) {
-      setError('Failed to send message: ' + err.message);
-    }
-  };
 
   // Return the hook's API
   return { 

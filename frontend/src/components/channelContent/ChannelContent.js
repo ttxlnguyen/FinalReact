@@ -24,21 +24,25 @@ function ChannelContent({ messages, selectedChannelId }) {
     flexDirection: 'column',
   };
 
+  const renderMessages = (messagesToRender) => {
+    return [...messagesToRender].reverse().map(message => (
+      <p key={message.id}>
+        <h4>{message.userProfile?.username + ": " || 'Unknown User: '}
+          <span className="timestamp">{new Date(message.sentAt).toLocaleString()}</span>
+        </h4>
+        <small>{message.content}</small>
+      </p>
+    ));
+  };
+
   if (selectedChannelId) {
     return (
       <div className="message-list" style={messageListStyle}>
         <h2>Messages</h2>
-        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column-reverse' }}>
-          {filteredMessages.map(message => (
-            <p key={message.id}>
-              <h4>{message.userProfile?.username + ": " || 'Unknown User: '}
-                <span className="timestamp">{new Date(message.sentAt).toLocaleString()}</span>
-              </h4>
-              <small>{message.content}</small>
-            </p>
-          ))}
+        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+          {renderMessages(filteredMessages)}
+          <div ref={messagesEndRef} />
         </div>
-        <div ref={messagesEndRef} />
       </div>
     );
   } else {
@@ -46,17 +50,10 @@ function ChannelContent({ messages, selectedChannelId }) {
     return (
       <div className="message-list" style={messageListStyle}>
         <h2>Messages</h2>
-        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column-reverse' }}>
-          {messages.map(message => (
-            <p key={message.id} >
-              <h4>{message.userProfile?.username + ": " || 'Unknown User: '}
-                <span className="timestamp">{new Date(message.sentAt).toLocaleString()}</span>
-              </h4>
-              <small>{message.content}</small>
-            </p>
-          ))}
+        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+          {renderMessages(messages)}
+          <div ref={messagesEndRef} />
         </div>
-        <div ref={messagesEndRef} />
       </div>
     );
   }
