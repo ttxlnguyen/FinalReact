@@ -60,7 +60,9 @@
 
 .modal-content input {
   margin-bottom: 10px;
-  padding: 5px;
+  padding: 8px; /* Adjusted to match button padding */
+  border: none;
+  border-radius: 4px;
 }
 
 /* New styles for button container Channel Creation */
@@ -73,7 +75,6 @@
 /* Updated button styles */
 .modal-content button {
   flex: 1;
-  margin: 0 5px;
   padding: 8px 12px;
   border: none;
   border-radius: 4px;
@@ -85,12 +86,14 @@
 .modal-content button[type="submit"] {
   background-color: #7289da;
   color: white;
+  margin-right: 5px; /* Add space between buttons */
 }
 
 /* Style for the secondary action button (e.g., Cancel) */
 .modal-content button[type="button"] {
   background-color: #747f8d;
   color: white;
+  margin-left: 5px; /* Add space between buttons */
 }
 
 .error-message {
