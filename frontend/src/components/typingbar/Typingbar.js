@@ -27,7 +27,7 @@ function Typingbar({ inputMessage, handleInputChange, handleMessageSubmit }) {
           value={inputMessage}
           onChange={handleInputChange}
           placeholder="Type your message here..."
-          className="message-input" // Added class for styling
+          className="message-input"
         />
         <button type="submit" className="send-button">Send</button> // Added class for styling
       </form>
