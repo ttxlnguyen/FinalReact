@@ -46,7 +46,7 @@ function Messages({ privateChannels, handleChannelSelect, createNewPrivateChanne
       {isModalOpen && (
         <div className="modal">
           <div className="modal-content">
-            <h3>Create New Private Channel</h3>
+            <h3>Create A Private Message</h3>
             {error && <p className="error-message">{error}</p>}
             <form onSubmit={handleCreateChannel}>
               <input
