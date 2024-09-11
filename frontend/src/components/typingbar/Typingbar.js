@@ -20,15 +20,16 @@ function Typingbar({ inputMessage, handleInputChange, handleMessageSubmit }) {
 
   return (
     <div className="typing-bar">
-      <form onSubmit={onSubmit} className="typing-bar">
+      <form onSubmit={onSubmit} className="typing-bar-form">
         <input
           ref={inputRef}
           type="text"
           value={inputMessage}
           onChange={handleInputChange}
-          placeholder="  Type your message here..."
+          placeholder="Type your message here..."
+          className="message-input" // Added class for styling
         />
-        <button type="submit">Send</button>
+        <button type="submit" className="send-button">Send</button> // Added class for styling
       </form>
     </div>
   );
