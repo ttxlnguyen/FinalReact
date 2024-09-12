@@ -60,6 +60,18 @@ export function useLogin(onLoginSuccess) {
     }
   };
 
+  // New function to handle key press
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (isRegistering) {
+        handleRegister(e);
+      } else {
+        handleSubmit(e);
+      }
+    }
+  };
+
   // Toggle between login and registration forms
   const toggleRegistration = () => {
     setIsRegistering(!isRegistering);
@@ -89,6 +101,7 @@ export function useLogin(onLoginSuccess) {
     handleSubmit,
     handleRegister,
     handleChange,
+    handleKeyPress,
     isRegistering,
     setIsRegistering,
     toggleRegistration
@@ -98,14 +111,14 @@ export function useLogin(onLoginSuccess) {
 /**
  * Login Process:
  * 1. User enters credentials in the login form.
- * 2. handleSubmit is called when the form is submitted.
+ * 2. handleSubmit is called when the form is submitted or Enter key is pressed.
  * 3. login function from auth.js is called with the username and password.
  * 4. If login is successful, onLoginSuccess is called with the token.
  * 5. If login fails, an error message is displayed.
  * 
  * Registration Process:
  * 1. User enters details in the registration form.
- * 2. handleRegister is called when the form is submitted.
+ * 2. handleRegister is called when the form is submitted or Enter key is pressed.
  * 3. register function from auth.js is called with the username, email, and password.
  * 4. If registration is successful, onLoginSuccess is called with the token.
  * 5. If registration fails, an error message is displayed.

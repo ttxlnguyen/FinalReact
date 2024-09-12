@@ -91,118 +91,132 @@ function useAppData(isLoggedIn) {
     }
   }, [isLoggedIn]);
 
-  // Create a new private channel
-  const createNewPrivateChannel = useCallback(async (invitedUsername) => {
-    if (!isLoggedIn) return;
-    try {
-      setLoading(true);
-      const currentUser = getCurrentUser();
-      if (!currentUser || !currentUser.username) {
-        throw new Error('No current user found');
-      }
+// Create a new private channel
+const createNewPrivateChannel = useCallback(async (invitedUsername) => {
+ console.log('createNewPrivateChannel called with:', invitedUsername);
+ if (!isLoggedIn) return;
+ try {
+   setLoading(true);
+   const currentUser = getCurrentUser();
+   if (!currentUser || !currentUser.username) {
+     console.error('No current user found');
+     throw new Error('No current user found');
+   }
 
-      // Check if the invited user exists
-      const userExists = await checkUserExists(invitedUsername);
-      if (!userExists) {
-        throw new Error(`User ${invitedUsername} does not exist.`);
-      }
+   console.log('Checking if user exists:', invitedUsername);
+   // Check if the invited user exists
+   const userExists = await checkUserExists(invitedUsername);
+   console.log('User exists:', userExists);
 
-      const newChannel = await createPrivateChannel(currentUser.username, invitedUsername);
-      
-      // Set the channel name to be the invited user's username
-      const channelWithName = {
-        ...newChannel,
-        name: invitedUsername
-      };
-      
-      setPrivateChannels(prevChannels => [...prevChannels, channelWithName]);
-      return channelWithName;
-    } catch (err) {
-      setError('Failed to create private channel: ' + err.message);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, [isLoggedIn]);
+   if (!userExists) {
+     console.log('User does not exist, throwing error');
+     const error = new Error(`User ${invitedUsername} does not exist.`);
+     error.status = 404;
+     throw error;
+   }
 
-  // Create a new public channel
-  const createNewPublicChannel = useCallback(async (channelName) => {
-    if (!isLoggedIn) return;
-    try {
-      setLoading(true);
-      const currentUser = getCurrentUser();
-      if (!currentUser || !currentUser.username) {
-        throw new Error('No current user found');
-      }
+   console.log('Creating private channel');
+   const newChannel = await createPrivateChannel(currentUser.username, invitedUsername);
+   
+   // Set the channel name to be the invited user's username
+   const channelWithName = {
+     ...newChannel,
+     name: invitedUsername
+   };
+   
+   console.log('New channel created:', channelWithName);
+   setPrivateChannels(prevChannels => [...prevChannels, channelWithName]);
+   return channelWithName;
+ } catch (err) {
+   console.error('Error in createNewPrivateChannel:', err);
+   if (err.status === 404) {
+     throw err; // Rethrow 404 error to be caught in Messages component
+   }
+   setError('Failed to create private channel: ' + err.message);
+   return null;
+ } finally {
+   setLoading(false);
+ }
+}, [isLoggedIn]);
 
-      const newChannel = await createPublicChannel(currentUser.username, channelName);
-      
-      setPublicChannels(prevChannels => [...prevChannels, newChannel]);
-      return newChannel;
-    } catch (err) {
-      setError('Failed to create public channel: ' + err.message);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, [isLoggedIn]);
+// Create a new public channel
+const createNewPublicChannel = useCallback(async (channelName) => {
+ if (!isLoggedIn) return;
+ try {
+   setLoading(true);
+   const currentUser = getCurrentUser();
+   if (!currentUser || !currentUser.username) {
+     throw new Error('No current user found');
+   }
 
-  // Function to select a channel
-  const selectChannel = (channelId) => {
-    setSelectedChannelId(channelId);
-  };
+   const newChannel = await createPublicChannel(currentUser.username, channelName);
+   
+   setPublicChannels(prevChannels => [...prevChannels, newChannel]);
+   return newChannel;
+ } catch (err) {
+   setError('Failed to create public channel: ' + err.message);
+   return null;
+ } finally {
+   setLoading(false);
+ }
+}, [isLoggedIn]);
 
-  // Function to send a message
-  const sendMessage = async (content, channelId = null) => {
-    if (!isLoggedIn) return;
-    try {
-      const actualChannelId = channelId || selectedChannelId;
-      if (!actualChannelId) {
-        throw new Error('No channel selected');
-      }
-      const newMessage = await postMessage({ content, channelId: actualChannelId });
-      
-      // Update messages immediately for the sender
-      setMessages(prevMessages => [...prevMessages, newMessage]);
-      
-      // Also update currentMessages ref
-      currentMessages.current = [...currentMessages.current, newMessage];
-    } catch (err) {
-      setError('Failed to send message: ' + err.message);
-    }
-  };
+// Function to select a channel
+const selectChannel = (channelId) => {
+ setSelectedChannelId(channelId);
+};
 
-  // Effect to fetch initial data when user logs in
-  useEffect(() => {
-    if (isLoggedIn) {
-      fetchChannels();
-      fetchPublicChannels();
-      fetchUserProfile();
-      const currentUser = getCurrentUser();
-      if (currentUser && currentUser.username) {
-        fetchPrivateChannels(currentUser.username);
-      }
-    }
-  }, [isLoggedIn, fetchChannels, fetchPublicChannels, fetchUserProfile, fetchPrivateChannels]);
+// Function to send a message
+const sendMessage = async (content, channelId = null) => {
+ if (!isLoggedIn) return;
+ try {
+   const actualChannelId = channelId || selectedChannelId;
+   if (!actualChannelId) {
+     throw new Error('No channel selected');
+   }
+   const newMessage = await postMessage({ content, channelId: actualChannelId });
+   
+   // Update messages immediately for the sender
+   setMessages(prevMessages => [...prevMessages, newMessage]);
+   
+   // Also update currentMessages ref
+   currentMessages.current = [...currentMessages.current, newMessage];
+ } catch (err) {
+   setError('Failed to send message: ' + err.message);
+ }
+};
 
-  // Effect to start polling when a channel is selected
-  useEffect(() => {
-    if (isLoggedIn && selectedChannelId) {
-      // Initial fetch
-      fetchMessages(selectedChannelId);
+// Effect to fetch initial data when user logs in
+useEffect(() => {
+ if (isLoggedIn) {
+   fetchChannels();
+   fetchPublicChannels();
+   fetchUserProfile();
+   const currentUser = getCurrentUser();
+   if (currentUser && currentUser.username) {
+     fetchPrivateChannels(currentUser.username);
+   }
+ }
+}, [isLoggedIn, fetchChannels, fetchPublicChannels, fetchUserProfile, fetchPrivateChannels]);
 
-      // Start polling
-      timer.current = setInterval(() => fetchMessages(selectedChannelId), 1000);
+// Effect to start polling when a channel is selected
+useEffect(() => {
+ if (isLoggedIn && selectedChannelId) {
+   // Initial fetch
+   fetchMessages(selectedChannelId);
 
-      // Cleanup function to clear the interval when the component unmounts or selectedChannelId changes
-      return () => {
-        if (timer.current) {
-          clearInterval(timer.current);
-          timer.current = null;
-        }
-      };
-    }
-  }, [isLoggedIn, selectedChannelId, fetchMessages]);
+   // Start polling
+   timer.current = setInterval(() => fetchMessages(selectedChannelId), 1000);
+
+   // Cleanup function to clear the interval when the component unmounts or selectedChannelId changes
+   return () => {
+     if (timer.current) {
+       clearInterval(timer.current);
+       timer.current = null;
+     }
+   };
+ }
+}, [isLoggedIn, selectedChannelId, fetchMessages]);
 
   // Return the hook's API
   return { 
@@ -213,6 +227,7 @@ function useAppData(isLoggedIn) {
     userProfile,
     loading, 
     error, 
+    setError, 
     selectChannel,
     selectedChannelId,
     setSelectedChannelId,
