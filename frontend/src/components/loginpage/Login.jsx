@@ -11,7 +11,8 @@ function Login({ onLoginSuccess }) {
     registrationError,
     handleSubmit,
     handleRegister,
-    toggleRegistration
+    toggleRegistration,
+    handleKeyPress 
   } = useLogin(onLoginSuccess);
 
   const handleInputChange = (e) => {
@@ -41,6 +42,7 @@ function Login({ onLoginSuccess }) {
                 name="username"
                 value={formData.username}
                 onChange={handleInputChange}
+                onKeyPress={handleKeyPress} 
                 required
               />
             </td>
@@ -57,6 +59,7 @@ function Login({ onLoginSuccess }) {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
+                  onKeyPress={handleKeyPress} 
                   required
                 />
               </td>
@@ -73,6 +76,7 @@ function Login({ onLoginSuccess }) {
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
+                onKeyPress={handleKeyPress} 
                 required
               />
             </td>

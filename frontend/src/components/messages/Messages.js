@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import './Messages.css';
 
 function Messages({ privateChannels, handleChannelSelect, createNewPrivateChannel }) {
@@ -6,11 +6,13 @@ function Messages({ privateChannels, handleChannelSelect, createNewPrivateChanne
   const [invitedUsername, setInvitedUsername] = useState('');
   const [error, setError] = useState(null);
 
-  const handleCreateChannel = async (e) => {
+  const handleCreateChannel = useCallback(async (e) => {
     e.preventDefault();
+    console.log('Attempting to create channel with username:', invitedUsername);
     if (invitedUsername.trim()) {
       try {
         const newChannel = await createNewPrivateChannel(invitedUsername.trim());
+        console.log('New channel created:', newChannel);
         if (newChannel) {
           setInvitedUsername('');
           setIsModalOpen(false);
@@ -19,10 +21,17 @@ function Messages({ privateChannels, handleChannelSelect, createNewPrivateChanne
           setError('Failed to create private channel. Please try again.');
         }
       } catch (err) {
-        setError(err.message);
+        console.error('Error creating channel:', err);
+        setError(`The username "${invitedUsername}" is invalid. Please try again.`);
       }
     }
-  };
+  }, [invitedUsername, createNewPrivateChannel]);
+
+  const handleCloseModal = useCallback(() => {
+    setIsModalOpen(false);
+    setError(null);
+    setInvitedUsername('');
+  }, []);
 
   return (
     <div className="messages-list">
@@ -47,7 +56,6 @@ function Messages({ privateChannels, handleChannelSelect, createNewPrivateChanne
         <div className="modal">
           <div className="modal-content">
             <h3>Create A Private Message</h3>
-            {error && <p className="error-message">{error}</p>}
             <form onSubmit={handleCreateChannel}>
               <input
                 type="text"
@@ -56,12 +64,14 @@ function Messages({ privateChannels, handleChannelSelect, createNewPrivateChanne
                 placeholder="Enter username to invite"
                 required
               />
+              {error && (
+                <div style={{color: 'red', marginTop: '10px', marginBottom: '10px'}}>
+                  {error}
+                </div>
+              )}
               <div className="button-container">
                 <button type="submit">Create</button>
-                <button type="button" onClick={() => {
-                  setIsModalOpen(false);
-                  setError(null);
-                }}>Cancel</button>
+                <button type="button" onClick={handleCloseModal}>Cancel</button>
               </div>
             </form>
           </div>
