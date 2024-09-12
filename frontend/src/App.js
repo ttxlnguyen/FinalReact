@@ -11,14 +11,15 @@ function App() {
   const [isMessagesOpen, setIsMessagesOpen] = useState(false); // Controls visibility of messages
   const [inputMessage, setInputMessage] = useState(''); // Stores the current message being typed
 
-  // Custom hook for managing app data (channels, messages, etc.)
-  const { 
+  // Custom hook for managing app data (channels, messages, etc.)  
+    const { 
     publicChannels,
     privateChannels,
     messages,
     setMessages, 
     loading, 
     error, 
+    setError,
     selectChannel, 
     selectedChannelId,
     setSelectedChannelId, 
@@ -30,8 +31,8 @@ function App() {
     createNewPublicChannel
   } = useAppData(isLoggedIn);
 
-  // Check authentication status when the component mounts
-  useEffect(() => {
+   // Check authentication status when the component mounts
+   useEffect(() => {
     const checkAuth = async () => {
       const authStatus = await checkAuthStatus();
       console.log('Auth status on app load:', authStatus);
@@ -141,6 +142,7 @@ function App() {
       isMessagesOpen={isMessagesOpen}
       loading={loading}
       error={error}
+      setError={setError}
       toggleChannelList={toggleChannelList}
       toggleMessages={toggleMessages}
       handleChannelSelect={handleChannelSelect}
